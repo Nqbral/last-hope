@@ -1,4 +1,5 @@
 /node_modules
 /.idea
+yarn.lock
 /workspaces/server/node_modules
 /workspaces/client/node_modules
