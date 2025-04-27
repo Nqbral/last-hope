@@ -1,0 +1,17 @@
+{
+  "name": "last-hope",
+  "version": "1.0.0",
+  "repository": "https://github.com/Nqbral/last-hope.git",
+  "author": "Simon Chevalier",
+  "license": "MIT",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "workspaces/*"
+    ]
+  },
+  "scripts": {
+    "start:dev:client": "yarn workspace @last-hope/client start:dev",
+    "start:prod:client": "yarn workspace @last-hope/client start:prod"
+  }
+}
