@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+@theme {
+  --color-text: oklch(96.7% 0.003 264.542);
+  --color-primary: oklch(76.5% 0.177 163.223);
+  --color-primary-hover: oklch(59.6% 0.145 163.225);
+  --color-secondary: oklch(70.7% 0.165 254.624);
+  --color-secondary-hover: oklch(70.7% 0.165 254.624);
+  --color-doctor: oklch(76.5% 0.177 163.223);
+  --color-doctor-hover: oklch(59.6% 0.145 163.225);
+  --color-infected: oklch(63.7% 0.237 25.331);
+  --color-infected-hover: oklch(57.7% 0.245 27.325);
+  --color-remedy: oklch(70.7% 0.165 254.624);
+  --color-remedy-hover: oklch(70.7% 0.165 254.624);
+  --color-sterile-tube: oklch(87.2% 0.01 258.338);
+  --color-sterile-tube-hover: oklch(44.2% 0.017 285.786);
+}
+
 html {
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -8,5 +24,5 @@ html {
   background: radial-gradient(oklch(23.1% 0 0), oklch(14.5% 0 0));
   background-size: cover;
   background-attachment: fixed;
-  color: var(--color-sky-50);
+  color: var(--color-text);
 }
