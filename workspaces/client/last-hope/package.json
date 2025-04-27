@@ -1,5 +1,5 @@
 {
-  "name": "last-hope",
+  "name": "@last-hope/client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
