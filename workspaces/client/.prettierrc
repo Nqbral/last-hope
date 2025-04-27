@@ -1,0 +1,26 @@
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "importOrder": ["^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "overrides": [
+    {
+      "files": ["*.mjs", "*.cjs", "*.js"],
+      "options": {
+        "parser": "babel"
+      }
+    },
+
+    {
+      "files": ["*.mts", "*.cts", "*.ts"],
+      "options": {
+        "parser": "babel-ts"
+      }
+    }
+  ]
+}
