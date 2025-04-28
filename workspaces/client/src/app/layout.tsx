@@ -1,14 +1,11 @@
-import type { Metadata } from "next";
-import { Orbitron } from "next/font/google";
-import "./globals.css";
+import App from '@components/app';
+import type { Metadata } from 'next';
 
-const orbitron = Orbitron({
-  subsets: ["latin"],
-});
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "Last Hope",
-  description: "Last Hope - online game",
+  title: 'Last Hope',
+  description: 'Last Hope - online game',
 };
 
 export default function RootLayout({
@@ -16,9 +13,5 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={`${orbitron.className}`}>{children}</body>
-    </html>
-  );
+  return <App>{children}</App>;
 }
