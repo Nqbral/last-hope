@@ -25,7 +25,17 @@ export default function Navbar() {
         {/* <Image src={NqbralGamesLogo} className="w-20" alt="nqbral-games-logo" /> */}
       </Link>
       {isLogged == null && <></>}
-      {isLogged == true && <div>{userName}</div>}
+      {isLogged == true && (
+        <div>
+          <Link
+            href={`${process.env.NEXT_PUBLIC_WS_NQBRAL_GAMES_URL}/profile/informations`}
+            className="transition-colors hover:text-neutral-300"
+            target="_blank"
+          >
+            {userName}
+          </Link>
+        </div>
+      )}
       {isLogged == false && (
         <button
           className="transition-colors hover:text-neutral-300"
