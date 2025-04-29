@@ -6,14 +6,9 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  const userString = localStorage.getItem('user');
-  let token = undefined;
+  const accessToken = localStorage.getItem('accessToken');
 
-  if (userString != undefined) {
-    token = JSON.parse(userString).accessToken;
-  }
-
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
   return config;
 });
 
@@ -34,7 +29,6 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (e) {
         localStorage.removeItem('accessToken');
-        window.location.href = '/signin';
         console.log(e);
       }
     }

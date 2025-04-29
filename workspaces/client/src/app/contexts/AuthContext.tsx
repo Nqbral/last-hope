@@ -5,58 +5,85 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type AuthContextType = {
   accessToken: string | null;
+  userName: string | null;
   isLoading: boolean;
   logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
   accessToken: null,
+  userName: null,
   isLoading: true,
   logout: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAccessToken = async () => {
-      await axios
-        .post(process.env.NEXT_PUBLIC_WS_API_AUTH_URL + '/auth/refresh')
-        .then((res) => {
-          if (res.status == 201) {
-            console.log('Log ok : ' + res.data.accessToken);
-            setAccessToken(res.data.accessToken);
-            return;
-          }
+    const authenticate = async () => {
+      try {
+        await axios
+          .post(process.env.NEXT_PUBLIC_WS_API_AUTH_URL + '/auth/refresh', {
+            withCredentials: true,
+          })
+          .then((res) => {
+            if (res.status == 201) {
+              setAccessToken(res.data.accessToken);
+              localStorage.setItem('accessToken', res.data.accessToken);
+              return;
+            }
 
-          setAccessToken(null);
-        })
-        .catch((error) => {
-          console.error('Erreur lors du refresh token', error);
-          setAccessToken(null);
-        });
+            setAccessToken(null);
+          });
+      } catch (error) {
+        console.error('Erreur lors du refresh token', error);
+        setAccessToken(null);
+      }
+
+      try {
+        await axios
+          .get(process.env.NEXT_PUBLIC_WS_API_AUTH_URL + '/user/profile', {
+            withCredentials: true,
+          })
+          .then((res) => {
+            if (res.status == 200) {
+              setUserName(res.data.username);
+              return;
+            }
+
+            setUserName(null);
+          });
+      } catch (error) {
+        console.error('Erreur lors de la récupération du profil', error);
+        setUserName(null);
+      }
 
       setIsLoading(false);
     };
 
-    fetchAccessToken();
+    authenticate();
   }, []);
 
   const logout = async () => {
-    await axios
-      .post(process.env.NEXT_PUBLIC_WS_API_AUTH_URL + '/auth/logout')
-      .then(() => {
-        console.log('Logout ok');
-        setAccessToken(null);
-      })
-      .catch((error) => {
-        console.error('Erreur logout', error);
-      });
+    try {
+      await axios
+        .post(process.env.NEXT_PUBLIC_WS_API_AUTH_URL + '/auth/logout', {
+          withCredentials: true,
+        })
+        .then(() => {
+          localStorage.removeIteme('accessToken');
+          setAccessToken(null);
+        });
+    } catch (error) {
+      console.error('Erreur logout', error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, isLoading, logout }}>
+    <AuthContext.Provider value={{ accessToken, userName, isLoading, logout }}>
       {children}
     </AuthContext.Provider>
   );
