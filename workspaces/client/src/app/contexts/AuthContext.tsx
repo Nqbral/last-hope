@@ -29,19 +29,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const checkAuth = async () => {
       try {
         await axios
-          .post(process.env.NEXT_PUBLIC_WS_API_AUTH_URL + '/auth/refresh', {
+          .get(process.env.NEXT_PUBLIC_WS_API_AUTH_URL + '/auth/verify_token', {
             withCredentials: true,
           })
           .then((res) => {
-            if (res.status == 201) {
-              setAccessToken(res.data.accessToken);
-              setIsLogged(true);
-              localStorage.setItem('accessToken', res.data.accessToken);
+            if (res.status == 200) {
               return;
             }
 
             setUserName(null);
             setAccessToken(null);
+            setIsLogged(false);
           });
       } catch (error) {
         console.error('Erreur lors du refresh token', error);
