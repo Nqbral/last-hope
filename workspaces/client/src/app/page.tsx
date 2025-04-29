@@ -1,4 +1,5 @@
 import LinkButton from '@components/buttons/LinkButton';
+import Footer from '@components/footer/Footer';
 import Navbar from '@components/navbar/Navbar';
 
 import LoadingAuth from './layout/LoadingAuth';
@@ -13,6 +14,7 @@ export default function Home() {
           <LinkButton buttonText={'Règles'} linkTo={'rules'} primary={false} />
         </div>
       </div>
+      <Footer />
     </LoadingAuth>
   );
 }
