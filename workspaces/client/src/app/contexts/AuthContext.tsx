@@ -7,6 +7,7 @@ type AuthContextType = {
   accessToken: string | null;
   userName: string | null;
   isLoading: boolean;
+  isLogged: boolean;
   logout: () => Promise<void>;
 };
 
@@ -14,6 +15,7 @@ const AuthContext = createContext<AuthContextType>({
   accessToken: null,
   userName: null,
   isLoading: true,
+  isLogged: false,
   logout: async () => {},
 });
 
@@ -21,6 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLogged, setIsLogged] = useState(false);
 
   useEffect(() => {
     const authenticate = async () => {
@@ -32,6 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .then((res) => {
             if (res.status == 201) {
               setAccessToken(res.data.accessToken);
+              setIsLogged(true);
               localStorage.setItem('accessToken', res.data.accessToken);
               return;
             }
@@ -75,6 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         })
         .then(() => {
           localStorage.removeIteme('accessToken');
+          setIsLogged(false);
           setAccessToken(null);
         });
     } catch (error) {
@@ -83,7 +88,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, userName, isLoading, logout }}>
+    <AuthContext.Provider
+      value={{ accessToken, userName, isLoading, isLogged, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
