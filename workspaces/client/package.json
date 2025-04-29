@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start:dev": "next dev -p 3033",
+    "start:dev": "next dev -p 3034",
     "start:prod": "next build && next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "axios": "^1.9.0",
     "next": "15.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

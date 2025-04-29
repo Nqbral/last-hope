@@ -1,6 +1,7 @@
 'use client';
 
-import { SocketProvider } from 'app/context/SocketContext';
+import { AuthProvider } from '@contexts/AuthContext';
+import { SocketProvider } from '@contexts/SocketContext';
 import { Orbitron } from 'next/font/google';
 
 const orbitron = Orbitron({
@@ -12,10 +13,12 @@ export default function App({
   children: React.ReactNode;
 }>) {
   return (
-    <SocketProvider>
-      <html className={`${orbitron.className}`}>
-        <body>{children}</body>
-      </html>
-    </SocketProvider>
+    <AuthProvider>
+      <SocketProvider>
+        <html className={`${orbitron.className}`}>
+          <body>{children}</body>
+        </html>
+      </SocketProvider>
+    </AuthProvider>
   );
 }
