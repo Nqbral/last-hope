@@ -26,6 +26,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLogged, setIsLogged] = useState(false);
 
   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        await axios
+          .post(process.env.NEXT_PUBLIC_WS_API_AUTH_URL + '/auth/refresh', {
+            withCredentials: true,
+          })
+          .then((res) => {
+            if (res.status == 201) {
+              setAccessToken(res.data.accessToken);
+              setIsLogged(true);
+              localStorage.setItem('accessToken', res.data.accessToken);
+              return;
+            }
+
+            setUserName(null);
+            setAccessToken(null);
+          });
+      } catch (error) {
+        console.error('Erreur lors du refresh token', error);
+        setUserName(null);
+        setAccessToken(null);
+        setIsLogged(false);
+      }
+    };
+
+    const interval = setInterval(checkAuth, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     const authenticate = async () => {
       try {
         await axios
