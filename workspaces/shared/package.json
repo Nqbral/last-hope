@@ -1,0 +1,13 @@
+{
+  "name": "@last-hope/shared",
+  "version": "1.0.0",
+  "author": "Simon Chevalier",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "eslint": "^9.25.1"
+  },
+  "dependencies": {
+    "socket.io": "^4.8.1"
+  }
+}
