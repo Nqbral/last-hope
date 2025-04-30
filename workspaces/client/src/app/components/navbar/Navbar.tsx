@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@contexts/AuthContext';
-import NqbralGamesLogo from '@public/nqbral-games-logo-row.png';
+import LastHopeLogo from '@public/last-hope-logo-row.png';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -21,8 +21,9 @@ export default function Navbar() {
   return (
     <div className="fixed top-0 flex w-full flex-row items-center justify-between bg-neutral-900 px-6 py-4 shadow-sm shadow-neutral-950">
       <Link href="/">
-        <div>Logo</div>
-        {/* <Image src={NqbralGamesLogo} className="w-20" alt="nqbral-games-logo" /> */}
+        <div className="flex flex-row items-center gap-2">
+          <Image src={LastHopeLogo} className="w-32" alt="nqbral-games-logo" />
+        </div>
       </Link>
       {isLogged == null && <></>}
       {isLogged == true && (
