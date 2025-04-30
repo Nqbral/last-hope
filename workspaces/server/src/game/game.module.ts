@@ -1,13 +1,15 @@
+import { AuthModule } from '@app/auth/auth.module';
+import { GameGateway } from '@app/game/game.gateway';
+import { LobbyManager } from '@app/game/lobby/lobby.manager';
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 
-import { AuthModule } from '../auth/auth.module';
-import { GameGateway } from './game.gateway';
-
 @Module({
   imports: [
     AuthModule,
+    HttpModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -17,6 +19,6 @@ import { GameGateway } from './game.gateway';
       inject: [ConfigService],
     }),
   ],
-  providers: [GameGateway],
+  providers: [GameGateway, LobbyManager],
 })
 export class GameModule {}
