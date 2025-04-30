@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               return;
             }
 
+            localStorage.removeItem('accessToken');
             setUserName(null);
             setAccessToken(null);
             setIsLogged(false);
@@ -45,6 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error('Erreur lors du refresh token', error);
         setUserName(null);
         setAccessToken(null);
+        localStorage.removeItem('accessToken');
         setIsLogged(false);
       }
     };
@@ -107,7 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           withCredentials: true,
         })
         .then(() => {
-          localStorage.removeIteme('accessToken');
+          localStorage.removeItem('accessToken');
           setIsLogged(false);
           setAccessToken(null);
         });
