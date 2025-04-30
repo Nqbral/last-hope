@@ -1,9 +1,13 @@
 'use client';
 
-import LinkButton from '@components/buttons/LinkButton';
+import LinkButton, { TypeLinkButton } from '@components/buttons/LinkButton';
 import PrimaryButton from '@components/buttons/PrimaryButton';
+import SecondaryButton from '@components/buttons/SecondaryButton';
+import Footer from '@components/footer/Footer';
+import Navbar from '@components/navbar/Navbar';
 import { useAuth } from '@contexts/AuthContext';
 import { useSocket } from '@contexts/SocketContext';
+import LoadingAuth from 'app/layout/LoadingAuth';
 import { CLIENT_EVENTS } from 'app/types/ClientEvents';
 
 export default function Home() {
@@ -20,11 +24,28 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-full min-h-screen w-full flex-col items-center justify-center gap-4">
-      <div className="flex flex-row gap-12">
-        <PrimaryButton buttonText="Créer un lobby" onClick={createLobby} />
-        <LinkButton buttonText={'Retour'} linkTo={'/'} primary={false} />
+    <LoadingAuth>
+      <Navbar />
+      <div className="flex h-full min-h-screen w-full flex-col items-center justify-center gap-4">
+        <div className="flex flex-row gap-12">
+          <PrimaryButton buttonText="Créer un lobby" onClick={createLobby} />
+          <SecondaryButton
+            buttonText="Rejoindre un lobby"
+            onClick={createLobby}
+          />
+        </div>
+        <LinkButton
+          buttonText={'Retour'}
+          linkTo={'/'}
+          typeButton={TypeLinkButton.tertiary}
+        />
+        {!isLogged && (
+          <p className="text-amber-400">
+            Vous devez être connecté pour jouer !
+          </p>
+        )}
+        <Footer />
       </div>
-    </div>
+    </LoadingAuth>
   );
 }
