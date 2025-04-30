@@ -21,7 +21,7 @@ export default function LinkButton({ linkTo, buttonText, typeButton }: Props) {
         </button>
       )}
       {typeButton == TypeLinkButton.secondary && (
-        <button className="button border-tertiary hover:border-tertiary-hover my-1 min-w-48 rounded-md border-2 px-6 py-2 transition-colors">
+        <button className="button border-secondary hover:border-secondary-hover my-1 min-w-48 rounded-md border-2 px-6 py-2 transition-colors">
           {buttonText}
         </button>
       )}

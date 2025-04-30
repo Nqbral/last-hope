@@ -1,4 +1,4 @@
-import { ClientSocketEvents } from '../types/ClientEvents';
+import { ClientSocketEvents } from '../../../../shared/types/ClientSocketEvents';
 import { io, Socket } from 'socket.io-client';
 
 export class SocketManager {
@@ -35,7 +35,7 @@ export class SocketManager {
   ): void => {
     console.log('test emit');
     if (!this.socket) return;
-    console.log('emit ' + event);
+
     this.socket.emit(event, data);
   };
 

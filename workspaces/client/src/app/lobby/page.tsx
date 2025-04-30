@@ -7,8 +7,8 @@ import Footer from '@components/footer/Footer';
 import Navbar from '@components/navbar/Navbar';
 import { useAuth } from '@contexts/AuthContext';
 import { useSocket } from '@contexts/SocketContext';
+import { CLIENT_EVENTS } from '@last-hope/shared/consts/ClientEvents';
 import LoadingAuth from 'app/layout/LoadingAuth';
-import { CLIENT_EVENTS } from 'app/types/ClientEvents';
 
 export default function Home() {
   const { isLogged } = useAuth();
