@@ -11,6 +11,7 @@ import { Server, Socket } from 'socket.io';
 
 import { AuthService } from '../auth/auth.service';
 import { JwtWsGuard } from '../auth/guards/jwt-ws.guard';
+import { CLIENT_EVENTS } from '../types/ClientEvents';
 
 @WebSocketGateway()
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -42,8 +43,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UseGuards(JwtWsGuard)
-  @SubscribeMessage('create_lobby')
+  @SubscribeMessage(CLIENT_EVENTS.LOBBY_CREATE)
   createLobby(@ConnectedSocket() client: Socket) {
-    const user = client.data.user;
+    console.log('create lobby');
   }
 }

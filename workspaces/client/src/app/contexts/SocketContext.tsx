@@ -1,36 +1,32 @@
-'use client';
-
 import { useAuth } from '@contexts/AuthContext';
-import { disconnectSocket, initSocket } from '@lib/socket';
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
+import { SocketManager } from '@lib/SocketManager';
+import React, { createContext, useContext, useEffect, useRef } from 'react';
 
-type SocketContextType = {
-  socket: Socket | null;
-};
+const SOCKET_URL = process.env.NEXT_PUBLIC_WS_API_SOCKET_URL as string;
 
-const SocketContext = createContext<SocketContextType>({ socket: null });
+const SocketContext = createContext<SocketManager | null>(null);
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-  const { accessToken, isLoading } = useAuth();
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const { accessToken } = useAuth();
+  const socketManagerRef = useRef(new SocketManager());
 
   useEffect(() => {
-    if (!isLoading && accessToken) {
-      const newSocket = initSocket(accessToken);
-      setSocket(newSocket);
+    if (accessToken) {
+      socketManagerRef.current.connect(accessToken, SOCKET_URL);
+    } else {
+      socketManagerRef.current.disconnect();
     }
-
-    return () => {
-      disconnectSocket();
-    };
-  }, [accessToken, isLoading]);
+  }, [accessToken]);
 
   return (
-    <SocketContext.Provider value={{ socket }}>
+    <SocketContext.Provider value={socketManagerRef.current}>
       {children}
     </SocketContext.Provider>
   );
 };
 
-export const useSocket = () => useContext(SocketContext);
+export const useSocket = () => {
+  const context = useContext(SocketContext);
+  if (!context) throw new Error('useSocket must be used within SocketProvider');
+  return context;
+};
