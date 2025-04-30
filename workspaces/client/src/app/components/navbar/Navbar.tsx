@@ -4,17 +4,19 @@ import { useAuth } from '@contexts/AuthContext';
 import LastHopeLogo from '@public/last-hope-logo-row.png';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Navbar() {
   const { isLogged, userName } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   const toLogin = () => {
     router.push(
       process.env.NEXT_PUBLIC_WS_NQBRAL_GAMES_URL +
         '/signin?redirect_to=' +
-        process.env.NEXT_PUBLIC_WS_LAST_HOPE_URL,
+        process.env.NEXT_PUBLIC_WS_LAST_HOPE_URL +
+        pathname,
     );
   };
 
