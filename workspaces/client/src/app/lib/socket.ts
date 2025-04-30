@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { ClientSocketEvents } from '@shared/client/ClientEvent';
 
 let socket: Socket | null = null;
 
@@ -16,7 +17,19 @@ export const initSocket = (accessToken: string): Socket => {
   return socket;
 };
 
-export const getSocket = (): Socket | null => {
+export const emitEvent = <T extends keyof ClientSocketEvents>(
+  event: T,
+  data: ClientSocketEvents[T],
+) => {
+  const socketInstance = getSocket();
+
+  socketInstance.emit(event, data);
+};
+
+export const getSocket = () => {
+  if (!socket) {
+    throw new Error('Socket not initialized. Call initSocket first.');
+  }
   return socket;
 };
 
