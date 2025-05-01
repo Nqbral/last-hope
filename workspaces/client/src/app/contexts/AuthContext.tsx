@@ -43,11 +43,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setIsLogged(false);
           });
       } catch (error) {
-        console.error('Erreur lors du refresh token', error);
-        setUserName(null);
-        setAccessToken(null);
-        localStorage.removeItem('accessToken');
-        setIsLogged(false);
+        console.log(error);
+        console.log('tentative refresh');
+        try {
+          await axios
+            .post(process.env.NEXT_PUBLIC_WS_API_AUTH_URL + '/auth/refresh', {
+              withCredentials: true,
+            })
+            .then((res) => {
+              if (res.status == 201) {
+                setAccessToken(res.data.accessToken);
+                setIsLogged(true);
+                localStorage.setItem('accessToken', res.data.accessToken);
+                return;
+              }
+
+              setAccessToken(null);
+            });
+        } catch (error) {
+          console.error('Erreur lors du refresh token', error);
+          setAccessToken(null);
+          setUserName(null);
+          localStorage.removeItem('accessToken');
+          setIsLogged(false);
+        }
       }
     };
 

@@ -8,8 +8,10 @@ export class JwtWsGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client: AuthenticatedSocket = context.switchToWs().getClient();
-    const token = client.handshake.auth?.token;
 
+    if (client.userId) return true;
+
+    const token = client.handshake.auth?.token;
     if (!token) return false;
 
     try {

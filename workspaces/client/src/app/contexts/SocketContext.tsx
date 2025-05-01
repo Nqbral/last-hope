@@ -2,8 +2,6 @@ import { useAuth } from '@contexts/AuthContext';
 import { SocketManager } from '@lib/SocketManager';
 import React, { createContext, useContext, useEffect, useRef } from 'react';
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_WS_API_SOCKET_URL as string;
-
 const SocketContext = createContext<SocketManager | null>(null);
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
@@ -12,10 +10,16 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (accessToken) {
-      socketManagerRef.current.connect(accessToken, SOCKET_URL);
-    } else {
-      socketManagerRef.current.disconnect();
+      if (socketManagerRef.current.isInit) {
+        socketManagerRef.current.updateToken(accessToken);
+        return;
+      }
+
+      socketManagerRef.current.connect(accessToken);
+      return;
     }
+
+    socketManagerRef.current.disconnect();
   }, [accessToken]);
 
   return (

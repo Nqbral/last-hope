@@ -38,7 +38,5 @@ export class Lobby {
         PLAYER_COLORS[this.players.length],
       ),
     );
-
-    console.log('ici');
   }
 }
