@@ -1,10 +1,13 @@
 import { ClientSocketEvents } from '@last-hope/shared/types/ClientSocketEvents';
 import { AUTH_EVENTS } from '@last-hope/shared/consts/AuthEvents';
+import { ServerEvents } from '@last-hope/shared/enums/ServerEvents';
 import { io, Socket } from 'socket.io-client';
 
 interface SocketAuth {
   token: string;
 }
+
+export type Listener<T> = (data: T) => void;
 
 export class SocketManager {
   private socket: Socket | null = null;
@@ -59,7 +62,6 @@ export class SocketManager {
     event: T,
     data: ClientSocketEvents[T],
   ): void => {
-    console.log('test emit');
     if (!this.socket) return;
 
     this.socket.emit(event, data);
@@ -67,5 +69,21 @@ export class SocketManager {
 
   get instance(): Socket | null {
     return this.socket;
+  }
+
+  addListener<T>(event: ServerEvents, listener: Listener<T>): this {
+    if (this.socket) this.socket.on(event, listener);
+
+    return this;
+  }
+
+  removeListener<T>(event: ServerEvents, listener: Listener<T>): this {
+    this.socket?.off(event, listener);
+
+    return this;
+  }
+
+  isConnected(): boolean {
+    return !!this.socket?.connected;
   }
 }

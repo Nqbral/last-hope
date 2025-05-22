@@ -1,9 +1,11 @@
 import { AuthService } from '@app/auth/auth.service';
+import { CurrentUser } from '@app/auth/decorators/current-user.decorator';
 import { JwtWsGuard } from '@app/auth/guards/jwt-ws.guard';
+import { AttachUserInterceptor } from '@app/auth/interceptors/attach-user.interceptor';
 import { LobbyManager } from '@app/game/lobby/lobby.manager';
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
 import { HttpService } from '@nestjs/axios';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, UseInterceptors } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -15,8 +17,9 @@ import {
 } from '@nestjs/websockets';
 import { AUTH_EVENTS } from '@shared/consts/AuthEvents';
 import { CLIENT_EVENTS } from '@shared/consts/ClientEvents';
-import { firstValueFrom } from 'rxjs';
 import { Server } from 'socket.io';
+
+import { LobbyJoinDto } from './lobby/dtos';
 
 @WebSocketGateway()
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -29,6 +32,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly httpService: HttpService,
   ) {}
 
+  afterInit(server: Server): any {
+    // Pass server instance to managers
+    this.lobbyManager.server = server;
+  }
+
   async handleConnection(client: any) {
     const token = client.handshake.auth?.token;
 
@@ -40,6 +48,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       const payload = await this.authService.verifyToken(token);
       client.user = payload; // Stocker l'utilisateur dans le client
+      client.userId = client.user.sub; // Met à jour le userId sur la connexion existante
+      client.userName = await this.authService.getUsername(token);
+      client.token = token;
     } catch (err) {
       client.disconnect();
     }
@@ -49,31 +60,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleDisconnect(client: any) {
     console.log(`Utilisateur déconnecté : ${client.user.sub}`);
-  }
-
-  async getUsername(accessToken: string): Promise<string> {
-    const url = `${process.env.NEXT_PUBLIC_WS_API_AUTH_URL}/user/profile/`;
-
-    const response = await firstValueFrom(
-      this.httpService.get(url, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }),
-    );
-
-    return response.data.username;
-  }
-
-  @SubscribeMessage(CLIENT_EVENTS.LOBBY_CREATE)
-  async createLobby(@ConnectedSocket() client: AuthenticatedSocket) {
-    const lobby = this.lobbyManager.createLobby(client);
-
-    if (client.userName == undefined) {
-      client.userName = await this.getUsername(client.handshake.auth.token);
-    }
-
-    lobby.addClient(client);
   }
 
   @SubscribeMessage(AUTH_EVENTS.UPDATE_TOKEN)
@@ -86,7 +72,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       const user = await this.authService.verifyToken(token);
       client.userId = user.sub; // Met à jour le userId sur la connexion existante
-      client.userName = await this.getUsername(token);
+      client.userName = await this.authService.getUsername(token);
+      client.token = token;
 
       return { success: true };
     } catch (err) {
@@ -94,5 +81,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.disconnect(); // Déconnecte si le nouveau token est invalide
       return { success: false, message: 'Token invalide' };
     }
+  }
+
+  @UseGuards(JwtWsGuard)
+  @UseInterceptors(AttachUserInterceptor)
+  @SubscribeMessage(CLIENT_EVENTS.LOBBY_CREATE)
+  async createLobby(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @CurrentUser() user: any,
+  ) {
+    this.lobbyManager.createLobby(client, user);
+  }
+
+  @UseGuards(JwtWsGuard)
+  @UseInterceptors(AttachUserInterceptor)
+  @SubscribeMessage(CLIENT_EVENTS.LOBBY_JOIN)
+  onLobbyJoin(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: LobbyJoinDto,
+    @CurrentUser() user: any,
+  ): void {
+    this.lobbyManager.joinLobby(data.lobbyIdJoin, client, user);
   }
 }

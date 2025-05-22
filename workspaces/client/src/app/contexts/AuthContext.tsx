@@ -70,9 +70,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
 
-    const interval = setInterval(checkAuth, 5000);
-
-    return () => clearInterval(interval);
+    window.addEventListener('focus', checkAuth);
+    return () => window.removeEventListener('focus', checkAuth);
   }, []);
 
   useEffect(() => {

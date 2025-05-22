@@ -4,19 +4,27 @@ import { useAuth } from '@contexts/AuthContext';
 import LastHopeLogo from '@public/last-hope-logo-row.png';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export default function Navbar() {
   const { isLogged, userName } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const toLogin = () => {
+    const currentUrl =
+      process.env.NEXT_PUBLIC_WS_LAST_HOPE_URL +
+      pathname +
+      (searchParams ? `?${searchParams.toString()}` : '');
+
+    // Encode l'URL car elle va être passée en paramètre GET
+    const redirectTo = encodeURIComponent(currentUrl);
+
     router.push(
       process.env.NEXT_PUBLIC_WS_NQBRAL_GAMES_URL +
         '/signin?redirect_to=' +
-        process.env.NEXT_PUBLIC_WS_LAST_HOPE_URL +
-        pathname,
+        redirectTo,
     );
   };
 

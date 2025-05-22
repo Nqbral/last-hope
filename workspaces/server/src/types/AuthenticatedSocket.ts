@@ -6,5 +6,7 @@ export class AuthenticatedSocket extends Socket {
 
   public userName: string;
 
+  public token: string;
+
   public lobby: Lobby | null;
 }

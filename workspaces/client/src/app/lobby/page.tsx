@@ -8,11 +8,18 @@ import Navbar from '@components/navbar/Navbar';
 import { useAuth } from '@contexts/AuthContext';
 import { useSocket } from '@contexts/SocketContext';
 import { CLIENT_EVENTS } from '@last-hope/shared/consts/ClientEvents';
+import { ServerEvents } from '@last-hope/shared/enums/ServerEvents';
+import { ServerPayloads } from '@last-hope/shared/types/ServerPayloads';
+import { Listener } from '@lib/SocketManager';
 import LoadingAuth from 'app/layout/LoadingAuth';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function Home() {
   const { isLogged } = useAuth();
-  const socket = useSocket();
+  const { isConnectedSocket, addListener, removeListener, emitEvent } =
+    useSocket();
+  const router = useRouter();
 
   const createLobby = () => {
     if (!isLogged) {
@@ -20,8 +27,26 @@ export default function Home() {
       return;
     }
 
-    socket.emitEvent(CLIENT_EVENTS.LOBBY_CREATE, undefined);
+    emitEvent(CLIENT_EVENTS.LOBBY_CREATE, undefined);
   };
+
+  useEffect(() => {
+    if (!isConnectedSocket) {
+      return;
+    }
+
+    const onLobbyState: Listener<ServerPayloads[ServerEvents.LobbyState]> = (
+      data,
+    ) => {
+      router.push('/game?lobby=' + data.lobbyId);
+    };
+
+    addListener(ServerEvents.LobbyState, onLobbyState);
+
+    return () => {
+      removeListener(ServerEvents.LobbyState, onLobbyState);
+    };
+  }, [isConnectedSocket, addListener, removeListener, router]);
 
   return (
     <LoadingAuth>

@@ -17,6 +17,7 @@ export class JwtWsGuard implements CanActivate {
     try {
       const payload = await this.authService.verifyToken(token);
       client.userId = payload.sub; // stocke l'utilisateur dans le socket
+
       return true;
     } catch (err) {
       return false;

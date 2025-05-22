@@ -1,5 +1,8 @@
-import { Player } from '@app/game/player/player';
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
+import { Player } from '@shared/classes/player';
+import { LOBBY_STATES } from '@shared/consts/LobbyStates';
+import { ServerEvents } from '@shared/enums/ServerEvents';
+import { ServerPayloads } from '@shared/types/ServerPayloads';
 import { Server } from 'socket.io';
 import { v4 } from 'uuid';
 
@@ -19,7 +22,9 @@ export class Lobby {
 
   public updatedAt: Date = new Date();
 
-  protected clients: AuthenticatedSocket[] = [];
+  public clients: AuthenticatedSocket[] = [];
+
+  public stateLobby: string = LOBBY_STATES.IN_LOBBY;
 
   protected players: Player[] = [];
 
@@ -28,15 +33,48 @@ export class Lobby {
     public readonly owner: AuthenticatedSocket,
   ) {}
 
-  public addClient(client: AuthenticatedSocket): void {
-    this.clients.push(client);
+  public addClient(newClient: AuthenticatedSocket): void {
+    if (
+      this.clients.findIndex((client) => {
+        return client.userId == newClient.userId;
+      }) != -1
+    ) {
+      // console.log('Utilisateur a deja rejoint');
+      this.dispatchLobbyState();
+      return;
+    }
 
-    this.players.push(
-      new Player(
-        client.userId,
-        client.userName,
-        PLAYER_COLORS[this.players.length],
-      ),
-    );
+    this.clients.push(newClient);
+    newClient.join(this.id);
+
+    newClient.lobby = this;
+
+    this.players.push(new Player(newClient.userId, newClient.userName));
+    this.initColorsPlayers();
+
+    this.dispatchLobbyState();
+  }
+
+  private initColorsPlayers(): void {
+    this.players.forEach((player, index) => {
+      player.color = PLAYER_COLORS[index];
+    });
+  }
+
+  public dispatchLobbyState(): void {
+    this.updatedAt = new Date();
+    const payload: ServerPayloads[ServerEvents.LobbyState] = {
+      lobbyId: this.id,
+      stateLobby: this.stateLobby,
+      players: this.players,
+    };
+
+    console.log(this.players);
+
+    this.dispatchToLobby(ServerEvents.LobbyState, payload);
+  }
+
+  public dispatchToLobby<T>(event: ServerEvents, payload: T): void {
+    this.server.to(this.id).emit(event, payload);
   }
 }
