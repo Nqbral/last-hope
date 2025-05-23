@@ -161,6 +161,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new WsException("Vous n'êtes pas le propriétaire du lobby.");
     }
 
-    this.lobbyManager.deleteLobby(lobby.id);
+    this.lobbyManager.deleteLobby(client, lobby.id);
   }
 }

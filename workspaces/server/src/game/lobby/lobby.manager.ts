@@ -1,6 +1,7 @@
 import { Lobby } from '@app/game/lobby/lobby';
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
 import { WsException } from '@nestjs/websockets';
+import { LOBBY_STATES } from '@shared/consts/LobbyStates';
 import { ServerEvents } from '@shared/enums/ServerEvents';
 import { Server } from 'socket.io';
 
@@ -22,10 +23,14 @@ export class LobbyManager {
     return lobby;
   }
 
-  protected getLobby(lobbyId: string): Lobby {
+  protected getLobby(client: AuthenticatedSocket, lobbyId: string): Lobby {
     const lobby = this.lobbies.get(lobbyId);
 
-    if (!lobby) {
+    if (!lobby || lobby.stateLobby == LOBBY_STATES.GAME_DELETED) {
+      this.server.to(client.id).emit(ServerEvents.LobbyError, {
+        error: 'Lobby not found',
+        message: 'Aucune partie a été trouvée pour cette URL.',
+      });
       throw new WsException('Lobby not found');
     }
 
@@ -37,7 +42,7 @@ export class LobbyManager {
     client: AuthenticatedSocket,
     user: any,
   ): void {
-    const lobby = this.getLobby(lobbyId);
+    const lobby = this.getLobby(client, lobbyId);
 
     if (lobby.clients.length >= 8) {
       this.server.to(client.id).emit(ServerEvents.LobbyError, {
@@ -50,8 +55,8 @@ export class LobbyManager {
     lobby.addClient(client);
   }
 
-  public deleteLobby(lobbyId: string): void {
-    const lobby = this.getLobby(lobbyId);
+  public deleteLobby(client: AuthenticatedSocket, lobbyId: string): void {
+    const lobby = this.getLobby(client, lobbyId);
     if (!lobby) return;
 
     lobby.deleteLobby();
