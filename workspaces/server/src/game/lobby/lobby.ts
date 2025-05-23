@@ -1,4 +1,5 @@
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
+import { WsException } from '@nestjs/websockets';
 import { Player } from '@shared/classes/player';
 import { LOBBY_STATES } from '@shared/consts/LobbyStates';
 import { ServerEvents } from '@shared/enums/ServerEvents';
@@ -80,6 +81,14 @@ export class Lobby {
   }
 
   public startGame(): void {
+    if (this.players.length < 4) {
+      throw new WsException('Not enough players to start the game.');
+    }
+
+    if (this.players.length > 8) {
+      throw new WsException('Too much players to start the game.');
+    }
+
     this.stateLobby = LOBBY_STATES.GAME_STARTED;
 
     this.dispatchLobbyState();

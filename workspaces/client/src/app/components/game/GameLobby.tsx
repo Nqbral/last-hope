@@ -6,6 +6,7 @@ import { CLIENT_EVENTS } from '@last-hope/shared/consts/ClientEvents';
 import { ServerEvents } from '@last-hope/shared/enums/ServerEvents';
 import { ServerPayloads } from '@last-hope/shared/types/ServerPayloads';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 type Props = {
   lobbyState: ServerPayloads[ServerEvents.LobbyState] | null;
@@ -14,11 +15,25 @@ type Props = {
 export default function GameLobby({ lobbyState }: Props) {
   const { userId, emitEvent } = useSocket();
   const router = useRouter();
+  const [errMsgName, setErrMsgName] = useState('');
 
   const isOwner = userId === lobbyState?.ownerId;
 
-  const handleStart = () =>
+  const handleStart = () => {
+    if (lobbyState?.players != undefined) {
+      if (lobbyState.players.length < 4) {
+        setErrMsgName("Il n'y a pas assez de joueurs pour lancer la partie.");
+        return;
+      }
+
+      if (lobbyState.players.length > 8) {
+        setErrMsgName('Il y a trop de joueurs pour lancer la partie.');
+        return;
+      }
+    }
+
     emitEvent(CLIENT_EVENTS.LOBBY_START_GAME, undefined);
+  };
   const handleDelete = () => emitEvent(CLIENT_EVENTS.LOBBY_DELETE, undefined);
   const handleLeave = () => {
     emitEvent(CLIENT_EVENTS.LOBBY_LEAVE, undefined);
@@ -40,6 +55,12 @@ export default function GameLobby({ lobbyState }: Props) {
           );
         })}
       </div>
+      <p
+        className={errMsgName ? 'text-red-600' : 'hidden'}
+        aria-live="assertive"
+      >
+        {errMsgName}
+      </p>
       {isOwner ? (
         <div className="flex flex-col items-center gap-2">
           <div className="flex flex-row items-center gap-3">
