@@ -14,9 +14,12 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { AUTH_EVENTS } from '@shared/consts/AuthEvents';
 import { CLIENT_EVENTS } from '@shared/consts/ClientEvents';
+import { LOBBY_STATES } from '@shared/consts/LobbyStates';
+import { ServerEvents } from '@shared/enums/ServerEvents';
 import { Server } from 'socket.io';
 
 import { LobbyJoinDto } from './lobby/dtos';
@@ -51,15 +54,30 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.userId = client.user.sub; // Met à jour le userId sur la connexion existante
       client.userName = await this.authService.getUsername(token);
       client.token = token;
+
+      client.emit(ServerEvents.Authenticated, {
+        userId: client.userId,
+      });
     } catch (err) {
       client.disconnect();
     }
-
-    console.log(`Utilisateur connecté : ${client.user.sub}`);
   }
 
-  async handleDisconnect(client: any) {
-    console.log(`Utilisateur déconnecté : ${client.user.sub}`);
+  async handleDisconnect(client: AuthenticatedSocket) {
+    if (!client.lobby) return;
+
+    const lobby = client.lobby;
+
+    const player = lobby.getPlayerById?.(client.userId);
+    if (player) {
+      if (lobby.stateLobby === LOBBY_STATES.IN_LOBBY) {
+        lobby.removeClient(client.userId);
+      } else {
+        player.disconnected = true;
+      }
+
+      lobby.dispatchLobbyState();
+    }
   }
 
   @SubscribeMessage(AUTH_EVENTS.UPDATE_TOKEN)
@@ -75,7 +93,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.userName = await this.authService.getUsername(token);
       client.token = token;
 
-      return { success: true };
+      client.emit(ServerEvents.Authenticated, {
+        userId: client.userId,
+      });
     } catch (err) {
       console.error('Erreur lors de la mise à jour du token', err);
       client.disconnect(); // Déconnecte si le nouveau token est invalide
@@ -102,5 +122,43 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @CurrentUser() user: any,
   ): void {
     this.lobbyManager.joinLobby(data.lobbyIdJoin, client, user);
+  }
+
+  @UseGuards(JwtWsGuard)
+  @SubscribeMessage(CLIENT_EVENTS.LOBBY_START_GAME)
+  handleStartGame(@ConnectedSocket() client: AuthenticatedSocket) {
+    const lobby = client.lobby;
+
+    if (!lobby) throw new WsException('Lobby introuvable');
+
+    if (lobby.owner.userId !== client.userId) {
+      throw new WsException("Vous n'êtes pas le propriétaire du lobby.");
+    }
+
+    lobby.startGame();
+  }
+
+  @UseGuards(JwtWsGuard)
+  @SubscribeMessage(CLIENT_EVENTS.LOBBY_LEAVE)
+  handleLeaveGame(@ConnectedSocket() client: AuthenticatedSocket) {
+    const lobby = client.lobby;
+
+    if (!lobby) throw new WsException('Lobby introuvable');
+
+    lobby.leaveLobby(client);
+  }
+
+  @UseGuards(JwtWsGuard)
+  @SubscribeMessage(CLIENT_EVENTS.LOBBY_DELETE)
+  handleDeleteLobby(@ConnectedSocket() client: AuthenticatedSocket) {
+    const lobby = client.lobby;
+
+    if (!lobby) throw new WsException('Lobby introuvable');
+
+    if (lobby.owner.userId !== client.userId) {
+      throw new WsException("Vous n'êtes pas le propriétaire du lobby.");
+    }
+
+    this.lobbyManager.deleteLobby(lobby.id);
   }
 }

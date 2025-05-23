@@ -34,13 +34,22 @@ export class Lobby {
   ) {}
 
   public addClient(newClient: AuthenticatedSocket): void {
-    if (
-      this.clients.findIndex((client) => {
-        return client.userId == newClient.userId;
-      }) != -1
-    ) {
-      // console.log('Utilisateur a deja rejoint');
+    const existing = this.players.find((p) => p.userId === newClient.userId);
+
+    if (existing) {
+      existing.disconnected = false;
+      newClient.join(this.id);
+      newClient.lobby = this;
       this.dispatchLobbyState();
+      return;
+    }
+
+    if (this.stateLobby != LOBBY_STATES.IN_LOBBY) {
+      this.server.to(newClient.id).emit(ServerEvents.LobbyError, {
+        error: 'Lobby in progress',
+        message:
+          'La partie est déjà en cours. Vous ne pouvez pas la rejoindre.',
+      });
       return;
     }
 
@@ -55,21 +64,48 @@ export class Lobby {
     this.dispatchLobbyState();
   }
 
+  public getPlayerById(userId: string): Player | undefined {
+    return this.players.find((p) => p.userId === userId);
+  }
+
+  public removeClient(userId: string): void {
+    this.clients = this.clients.filter((c) => c.userId !== userId);
+    this.players = this.players.filter((p) => p.userId !== userId);
+  }
+
   private initColorsPlayers(): void {
     this.players.forEach((player, index) => {
       player.color = PLAYER_COLORS[index];
     });
   }
 
+  public startGame(): void {
+    this.stateLobby = LOBBY_STATES.GAME_STARTED;
+
+    this.dispatchLobbyState();
+  }
+
+  public leaveLobby(client: AuthenticatedSocket): void {
+    this.removeClient(client.userId);
+    client.leave(this.id);
+
+    this.dispatchLobbyState();
+  }
+
+  public deleteLobby(): void {
+    this.stateLobby = LOBBY_STATES.GAME_DELETED;
+
+    this.dispatchLobbyState();
+  }
+
   public dispatchLobbyState(): void {
     this.updatedAt = new Date();
     const payload: ServerPayloads[ServerEvents.LobbyState] = {
       lobbyId: this.id,
+      ownerId: this.owner.userId,
       stateLobby: this.stateLobby,
       players: this.players,
     };
-
-    console.log(this.players);
 
     this.dispatchToLobby(ServerEvents.LobbyState, payload);
   }

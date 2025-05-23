@@ -35,5 +35,10 @@ export default function IsPrivate({
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  );
 }

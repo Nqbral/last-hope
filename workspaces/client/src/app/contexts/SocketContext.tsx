@@ -20,6 +20,7 @@ type SocketContextType = {
   addListener: <T>(event: ServerEvents, listener: Listener<T>) => void;
   removeListener: <T>(event: ServerEvents, listener: Listener<T>) => void;
   isConnectedSocket: boolean;
+  userId: string | null;
 };
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -36,6 +37,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const socketManagerRef = useRef(new SocketManager());
   const { accessToken } = useAuth();
   const [isConnectedSocket, setIsConnectedSocket] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (accessToken) {
@@ -54,6 +56,22 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     setIsConnectedSocket(false);
     socketManagerRef.current.disconnect();
   }, [accessToken, setIsConnectedSocket]);
+
+  useEffect(() => {
+    const socketManager = socketManagerRef.current;
+
+    if (!socketManager || !isConnectedSocket) return;
+
+    const onAuthenticated = (payload: { userId: string; userName: string }) => {
+      setUserId(payload.userId);
+    };
+
+    socketManager.addListener(ServerEvents.Authenticated, onAuthenticated);
+
+    return () => {
+      socketManager.removeListener(ServerEvents.Authenticated, onAuthenticated);
+    };
+  }, [isConnectedSocket]);
 
   const emitEvent = <T extends keyof ClientSocketEvents>(
     event: T,
@@ -78,6 +96,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         addListener,
         removeListener,
         isConnectedSocket,
+        userId,
       }}
     >
       {children}

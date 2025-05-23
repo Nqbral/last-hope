@@ -1,6 +1,7 @@
 import { Lobby } from '@app/game/lobby/lobby';
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
 import { WsException } from '@nestjs/websockets';
+import { ServerEvents } from '@shared/enums/ServerEvents';
 import { Server } from 'socket.io';
 
 export class LobbyManager {
@@ -12,8 +13,6 @@ export class LobbyManager {
   >();
 
   public createLobby(owner: AuthenticatedSocket, user: any): Lobby {
-    console.log('create');
-    console.log(user);
     const lobby = new Lobby(this.server, owner);
 
     this.lobbies.set(lobby.id, lobby);
@@ -23,11 +22,10 @@ export class LobbyManager {
     return lobby;
   }
 
-  protected getLobby(lobbyId: string, client: AuthenticatedSocket): Lobby {
+  protected getLobby(lobbyId: string): Lobby {
     const lobby = this.lobbies.get(lobbyId);
 
     if (!lobby) {
-      console.log('lobby not foud');
       throw new WsException('Lobby not found');
     }
 
@@ -39,13 +37,28 @@ export class LobbyManager {
     client: AuthenticatedSocket,
     user: any,
   ): void {
-    const lobby = this.getLobby(lobbyId, client);
+    const lobby = this.getLobby(lobbyId);
 
     if (lobby.clients.length >= 8) {
-      console.log('Trop de joueurs');
+      this.server.to(client.id).emit(ServerEvents.LobbyError, {
+        error: 'Lobby full',
+        message: 'La partie est déjà pleine.',
+      });
       throw new WsException('Trop de joueurs');
     }
 
     lobby.addClient(client);
+  }
+
+  public deleteLobby(lobbyId: string): void {
+    const lobby = this.getLobby(lobbyId);
+    if (!lobby) return;
+
+    lobby.deleteLobby();
+
+    lobby.clients.forEach((client) => {
+      client.leave(lobbyId);
+      client.lobby = null;
+    });
   }
 }
