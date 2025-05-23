@@ -1,3 +1,4 @@
+import RedButton from '@components/buttons/RedButton';
 import { useSocket } from '@contexts/SocketContext';
 import { Player } from '@last-hope/shared/classes/Player';
 import { CLIENT_EVENTS } from '@last-hope/shared/consts/ClientEvents';
@@ -55,6 +56,9 @@ export default function ModalPauseDisconnect({ lobbyState }: Props) {
             );
           })}
         </div>
+        {isOwner && (
+          <RedButton buttonText="Supprimer le lobby" onClick={handleDelete} />
+        )}
       </div>
     </ModalTemplate>
   );
