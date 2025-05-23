@@ -27,6 +27,8 @@ export class Lobby {
 
   public stateLobby: string = LOBBY_STATES.IN_LOBBY;
 
+  public stateBeforePause: string = '';
+
   protected players: Player[] = [];
 
   constructor(
@@ -41,6 +43,8 @@ export class Lobby {
       existing.disconnected = false;
       newClient.join(this.id);
       newClient.lobby = this;
+
+      this.unPauseGame();
       this.dispatchLobbyState();
       return;
     }
@@ -92,6 +96,25 @@ export class Lobby {
     this.stateLobby = LOBBY_STATES.GAME_STARTED;
 
     this.dispatchLobbyState();
+  }
+
+  public pauseGame(): void {
+    this.stateBeforePause = this.stateLobby;
+    this.stateLobby = LOBBY_STATES.GAME_PAUSED;
+
+    this.dispatchLobbyState();
+  }
+
+  public unPauseGame(): void {
+    const playersDisconnected = this.players.filter((p) => p.disconnected);
+
+    if (
+      playersDisconnected.length == 0 &&
+      this.stateLobby == LOBBY_STATES.GAME_PAUSED
+    ) {
+      this.stateLobby = this.stateBeforePause;
+      this.stateBeforePause = '';
+    }
   }
 
   public leaveLobby(client: AuthenticatedSocket): void {

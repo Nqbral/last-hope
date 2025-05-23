@@ -74,6 +74,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         lobby.removeClient(client.userId);
       } else {
         player.disconnected = true;
+        lobby.pauseGame();
+        return;
       }
 
       lobby.dispatchLobbyState();

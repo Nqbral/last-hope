@@ -9,6 +9,7 @@ import { Listener } from '@lib/SocketManager';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import Game from './Game';
 import GameLobby from './GameLobby';
 import GameLobbyDeleted from './GameLobbyDeleted';
 import GameLobbyError from './GameLobbyError';
@@ -80,5 +81,5 @@ export default function GameManager() {
     }
   }
 
-  return <></>;
+  return <Game lobbyState={lobbyState} />;
 }
