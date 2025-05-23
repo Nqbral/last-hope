@@ -29,7 +29,7 @@ export class Lobby {
 
   public stateBeforePause: string = '';
 
-  protected players: Player[] = [];
+  public players: Player[] = [];
 
   constructor(
     private readonly server: Server,
@@ -119,6 +119,7 @@ export class Lobby {
 
   public leaveLobby(client: AuthenticatedSocket): void {
     this.removeClient(client.userId);
+    client.lobby = null;
     client.leave(this.id);
 
     this.dispatchLobbyState();

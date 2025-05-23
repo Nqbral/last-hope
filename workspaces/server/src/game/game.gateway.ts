@@ -54,9 +54,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.userId = client.user.sub; // Met à jour le userId sur la connexion existante
       client.userName = await this.authService.getUsername(token);
       client.token = token;
+      const lastLobbyId = this.lobbyManager.getLastLobbyForUser(client.userId);
 
       client.emit(ServerEvents.Authenticated, {
         userId: client.userId,
+        lobbyId: lastLobbyId,
       });
     } catch (err) {
       client.disconnect();
@@ -67,11 +69,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!client.lobby) return;
 
     const lobby = client.lobby;
-
     const player = lobby.getPlayerById?.(client.userId);
+
     if (player) {
       if (lobby.stateLobby === LOBBY_STATES.IN_LOBBY) {
+        if (lobby.owner.userId == client.userId) {
+          this.lobbyManager.deleteLobby(client, lobby.id);
+          return;
+        }
         lobby.removeClient(client.userId);
+        client.leave(lobby.id);
+        this.lobbyManager.clearLastLobbyForUser(client.userId);
       } else {
         player.disconnected = true;
         lobby.pauseGame();
@@ -94,9 +102,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.userId = user.sub; // Met à jour le userId sur la connexion existante
       client.userName = await this.authService.getUsername(token);
       client.token = token;
+      const lastLobbyId = this.lobbyManager.getLastLobbyForUser(client.userId);
 
       client.emit(ServerEvents.Authenticated, {
         userId: client.userId,
+        lobbyId: lastLobbyId,
       });
     } catch (err) {
       console.error('Erreur lors de la mise à jour du token', err);
@@ -147,6 +157,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (!lobby) throw new WsException('Lobby introuvable');
 
+    this.lobbyManager.clearLastLobbyForUser(client.userId);
     lobby.leaveLobby(client);
   }
 

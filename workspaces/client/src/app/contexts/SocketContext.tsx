@@ -21,6 +21,7 @@ type SocketContextType = {
   removeListener: <T>(event: ServerEvents, listener: Listener<T>) => void;
   isConnectedSocket: boolean;
   userId: string | null;
+  lastLobby: string | null;
 };
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -38,6 +39,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const { accessToken } = useAuth();
   const [isConnectedSocket, setIsConnectedSocket] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [lastLobby, setLastLobby] = useState<string | null>(null);
 
   useEffect(() => {
     if (accessToken) {
@@ -62,8 +64,11 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (!socketManager || !isConnectedSocket) return;
 
-    const onAuthenticated = (payload: { userId: string; userName: string }) => {
+    const onAuthenticated = (payload: { userId: string; lobbyId: string }) => {
       setUserId(payload.userId);
+      setLastLobby(payload.lobbyId);
+
+      console.log(payload.lobbyId);
     };
 
     socketManager.addListener(ServerEvents.Authenticated, onAuthenticated);
@@ -97,6 +102,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         removeListener,
         isConnectedSocket,
         userId,
+        lastLobby,
       }}
     >
       {children}

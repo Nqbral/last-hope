@@ -13,12 +13,16 @@ export class LobbyManager {
     Lobby
   >();
 
+  private readonly lastKnownLobbyPerUser: Map<string, string> = new Map();
+
   public createLobby(owner: AuthenticatedSocket, user: any): Lobby {
     const lobby = new Lobby(this.server, owner);
 
     this.lobbies.set(lobby.id, lobby);
 
     lobby.addClient(owner);
+
+    this.lastKnownLobbyPerUser.set(owner.userId, lobby.id);
 
     return lobby;
   }
@@ -37,6 +41,14 @@ export class LobbyManager {
     return lobby;
   }
 
+  public getLastLobbyForUser(userId: string): string | undefined {
+    return this.lastKnownLobbyPerUser.get(userId);
+  }
+
+  public clearLastLobbyForUser(userId: string): void {
+    this.lastKnownLobbyPerUser.delete(userId);
+  }
+
   public joinLobby(
     lobbyId: string,
     client: AuthenticatedSocket,
@@ -52,6 +64,8 @@ export class LobbyManager {
       throw new WsException('Trop de joueurs');
     }
 
+    this.lastKnownLobbyPerUser.set(client.userId, lobby.id);
+
     lobby.addClient(client);
   }
 
@@ -64,6 +78,7 @@ export class LobbyManager {
     lobby.clients.forEach((client) => {
       client.leave(lobbyId);
       client.lobby = null;
+      this.clearLastLobbyForUser(client.userId);
     });
   }
 }
