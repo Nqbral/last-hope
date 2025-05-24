@@ -29,6 +29,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
+  private playerConnections = new Map<string, Set<string>>();
+
   constructor(
     private readonly authService: AuthService,
     private readonly lobbyManager: LobbyManager,
@@ -56,6 +58,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.token = token;
       const lastLobbyId = this.lobbyManager.getLastLobbyForUser(client.userId);
 
+      if (!this.playerConnections.has(client.userId)) {
+        this.playerConnections.set(client.userId, new Set());
+      }
+
+      this.playerConnections.get(client.userId)!.add(client.id);
+
       client.emit(ServerEvents.Authenticated, {
         userId: client.userId,
         lobbyId: lastLobbyId,
@@ -71,7 +79,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const lobby = client.lobby;
     const player = lobby.getPlayerById?.(client.userId);
 
-    if (player) {
+    const connections = this.playerConnections.get(client.userId);
+    if (!connections) return;
+
+    connections.delete(client.id);
+
+    if (connections.size === 0 && player) {
       if (lobby.stateLobby == LOBBY_STATES.IN_LOBBY) {
         if (lobby.owner.userId == client.userId) {
           this.lobbyManager.deleteLobby(client, lobby.id);

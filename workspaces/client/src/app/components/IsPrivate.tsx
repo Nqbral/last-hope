@@ -3,6 +3,7 @@
 import { useAuth } from '@contexts/AuthContext';
 import { Triangle } from 'react-loader-spinner';
 
+import Footer from './footer/Footer';
 import Navbar from './navbar/Navbar';
 
 export default function IsPrivate({
@@ -31,6 +32,7 @@ export default function IsPrivate({
       <div className="flex min-h-screen w-full flex-col items-center justify-center gap-4">
         <Navbar />
         <p className="text-amber-400">Vous devez être connecté pour jouer !</p>
+        <Footer />
       </div>
     );
   }
