@@ -72,6 +72,17 @@ export default function GameManager() {
     return <GameLobbyError error={lobbyError} />;
   }
 
+  if (lobbyState.lobbyId == '') {
+    return (
+      <GameLobbyError
+        error={{
+          error: 'Lobby not found',
+          message: 'Aucune partie a été trouvée pour cette URL.',
+        }}
+      />
+    );
+  }
+
   if (lobbyState.lobbyId != '') {
     switch (lobbyState.stateLobby) {
       case LOBBY_STATES.IN_LOBBY:
