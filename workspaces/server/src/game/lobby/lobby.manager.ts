@@ -79,6 +79,7 @@ export class LobbyManager {
       client.leave(lobbyId);
       client.lobby = null;
       this.clearLastLobbyForUser(client.userId);
+      client.emit(ServerEvents.LobbyLeave);
     });
   }
 }

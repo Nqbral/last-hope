@@ -5,6 +5,7 @@ import PrimaryButton from '@components/buttons/PrimaryButton';
 import SecondaryButton from '@components/buttons/SecondaryButton';
 import Footer from '@components/footer/Footer';
 import Navbar from '@components/navbar/Navbar';
+import LobbyReconnectToast from '@components/toast/LobbyReconnectToast';
 import { useAuth } from '@contexts/AuthContext';
 import { useSocket } from '@contexts/SocketContext';
 import { CLIENT_EVENTS } from '@last-hope/shared/consts/ClientEvents';
@@ -51,6 +52,7 @@ export default function Home() {
   return (
     <LoadingAuth>
       <Navbar />
+      <LobbyReconnectToast />
       <div className="flex h-full min-h-screen w-full flex-col items-center justify-center gap-4">
         <div className="flex flex-row gap-12">
           <PrimaryButton buttonText="Créer un lobby" onClick={createLobby} />

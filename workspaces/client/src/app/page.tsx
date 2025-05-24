@@ -1,6 +1,7 @@
 import LinkButton, { TypeLinkButton } from '@components/buttons/LinkButton';
 import Footer from '@components/footer/Footer';
 import Navbar from '@components/navbar/Navbar';
+import LobbyReconnectToast from '@components/toast/LobbyReconnectToast';
 import LastHopeLogo from '@public/last-hope-logo.png';
 import Image from 'next/image';
 
@@ -10,6 +11,7 @@ export default function Home() {
   return (
     <LoadingAuth>
       <Navbar />
+      <LobbyReconnectToast />
       <div className="flex h-full min-h-screen w-full flex-col items-center justify-center gap-6">
         <Image src={LastHopeLogo} alt="last-hope-logo" className="w-64" />
         <div className="flex flex-row gap-12">

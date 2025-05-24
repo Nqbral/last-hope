@@ -159,6 +159,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.lobbyManager.clearLastLobbyForUser(client.userId);
     lobby.leaveLobby(client);
+
+    client.emit(ServerEvents.LobbyLeave);
   }
 
   @UseGuards(JwtWsGuard)
