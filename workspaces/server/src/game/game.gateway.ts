@@ -172,9 +172,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!lobby) throw new WsException('Lobby introuvable');
 
     this.lobbyManager.clearLastLobbyForUser(client.userId);
-    lobby.leaveLobby(client);
-
     client.emit(ServerEvents.LobbyLeave);
+
+    if (
+      lobby.stateLobby === LOBBY_STATES.IN_LOBBY &&
+      lobby.owner.userId === client.userId
+    ) {
+      this.lobbyManager.deleteLobby(client, lobby.id);
+      return;
+    }
+
+    lobby.leaveLobby(client);
   }
 
   @UseGuards(JwtWsGuard)
