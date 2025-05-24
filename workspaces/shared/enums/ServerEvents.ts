@@ -5,5 +5,7 @@ export enum ServerEvents {
   // Lobby
   LobbyState = "server.lobby.state",
   LobbyError = "server.lobby.error",
+  LobbyCreate = "server.lobby.create",
+  LobbyJoin = "server.lobby.join",
   LobbyLeave = "server.lobby.leave",
 }

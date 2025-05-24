@@ -2,11 +2,24 @@
 
 import LinkButton, { TypeLinkButton } from '@components/buttons/LinkButton';
 import { useSocket } from '@contexts/SocketContext';
+import { useEffect, useState } from 'react';
 
 export default function LobbyReconnectToast() {
   const { isConnectedSocket, lastLobby } = useSocket();
+  const [show, setShow] = useState(false);
 
-  if (!isConnectedSocket || lastLobby == undefined) {
+  useEffect(() => {
+    console.log('Modification toast');
+    console.log(lastLobby);
+    if (isConnectedSocket && lastLobby != undefined) {
+      setShow(true);
+      return;
+    }
+
+    setShow(false);
+  }, [isConnectedSocket, lastLobby]);
+
+  if (!show) {
     return <></>;
   }
 

@@ -67,14 +67,24 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     const onAuthenticated = (payload: { userId: string; lobbyId: string }) => {
       setUserId(payload.userId);
       setLastLobby(payload.lobbyId);
+    };
 
-      console.log(payload.lobbyId);
+    const onLobbyJoin = (payload: { lobbyId: string }) => {
+      setLastLobby(payload.lobbyId);
+    };
+
+    const onLobbyLeave = () => {
+      setLastLobby(null);
     };
 
     socketManager.addListener(ServerEvents.Authenticated, onAuthenticated);
+    socketManager.addListener(ServerEvents.LobbyJoin, onLobbyJoin);
+    socketManager.addListener(ServerEvents.LobbyLeave, onLobbyLeave);
 
     return () => {
       socketManager.removeListener(ServerEvents.Authenticated, onAuthenticated);
+      socketManager.removeListener(ServerEvents.LobbyJoin, onLobbyJoin);
+      socketManager.removeListener(ServerEvents.LobbyLeave, onLobbyLeave);
     };
   }, [isConnectedSocket]);
 

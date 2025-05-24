@@ -4,7 +4,9 @@ import LinkButton, { TypeLinkButton } from '@components/buttons/LinkButton';
 import PrimaryButton from '@components/buttons/PrimaryButton';
 import SecondaryButton from '@components/buttons/SecondaryButton';
 import Footer from '@components/footer/Footer';
+import ModalJoinLobby from '@components/modal/ModalJoinLobby';
 import Navbar from '@components/navbar/Navbar';
+import CustomNotification from '@components/notifications/CustomNotification';
 import LobbyReconnectToast from '@components/toast/LobbyReconnectToast';
 import { useAuth } from '@contexts/AuthContext';
 import { useSocket } from '@contexts/SocketContext';
@@ -12,19 +14,45 @@ import { CLIENT_EVENTS } from '@last-hope/shared/consts/ClientEvents';
 import { ServerEvents } from '@last-hope/shared/enums/ServerEvents';
 import { ServerPayloads } from '@last-hope/shared/types/ServerPayloads';
 import { Listener } from '@lib/SocketManager';
+import { Modal } from '@mui/material';
 import LoadingAuth from 'app/layout/LoadingAuth';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Slide, ToastContainer, toast } from 'react-toastify';
 
 export default function Home() {
   const { isLogged } = useAuth();
-  const { isConnectedSocket, addListener, removeListener, emitEvent } =
-    useSocket();
+  const {
+    isConnectedSocket,
+    lastLobby,
+    addListener,
+    removeListener,
+    emitEvent,
+  } = useSocket();
   const router = useRouter();
+  const [openLobbyJoin, setOpenLobbyJoin] = useState(false);
+  const handleOpenLobbyJoin = () => setOpenLobbyJoin(true);
+  const handleCloseLobbyJoin = () => setOpenLobbyJoin(false);
 
   const createLobby = () => {
     if (!isLogged) {
       console.log('Doit etre loggué');
+      return;
+    }
+
+    if (lastLobby) {
+      toast(CustomNotification, {
+        data: {
+          title: 'Erreur',
+          content:
+            'Vous êtes déjà dans une partie. Vous ne pouvez pas créer un lobby.',
+        },
+        hideProgressBar: true,
+        closeButton: false,
+        style: {
+          width: 300,
+        },
+      });
       return;
     }
 
@@ -36,16 +64,16 @@ export default function Home() {
       return;
     }
 
-    const onLobbyState: Listener<ServerPayloads[ServerEvents.LobbyState]> = (
+    const onLobbyCreate: Listener<ServerPayloads[ServerEvents.LobbyCreate]> = (
       data,
     ) => {
       router.push('/game?lobby=' + data.lobbyId);
     };
 
-    addListener(ServerEvents.LobbyState, onLobbyState);
+    addListener(ServerEvents.LobbyCreate, onLobbyCreate);
 
     return () => {
-      removeListener(ServerEvents.LobbyState, onLobbyState);
+      removeListener(ServerEvents.LobbyCreate, onLobbyCreate);
     };
   }, [isConnectedSocket, addListener, removeListener, router]);
 
@@ -53,12 +81,21 @@ export default function Home() {
     <LoadingAuth>
       <Navbar />
       <LobbyReconnectToast />
+      <ToastContainer transition={Slide} />
+      <Modal
+        open={openLobbyJoin}
+        onClose={handleCloseLobbyJoin}
+        aria-labelledby="modal-lobby-join"
+        aria-describedby="modal-lobby-join"
+      >
+        <ModalJoinLobby handleClose={handleCloseLobbyJoin} />
+      </Modal>
       <div className="flex h-full min-h-screen w-full flex-col items-center justify-center gap-4">
         <div className="flex flex-row gap-12">
           <PrimaryButton buttonText="Créer un lobby" onClick={createLobby} />
           <SecondaryButton
             buttonText="Rejoindre un lobby"
-            onClick={createLobby}
+            onClick={handleOpenLobbyJoin}
           />
         </div>
         <LinkButton

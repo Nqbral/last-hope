@@ -72,7 +72,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const player = lobby.getPlayerById?.(client.userId);
 
     if (player) {
-      if (lobby.stateLobby === LOBBY_STATES.IN_LOBBY) {
+      if (lobby.stateLobby == LOBBY_STATES.IN_LOBBY) {
         if (lobby.owner.userId == client.userId) {
           this.lobbyManager.deleteLobby(client, lobby.id);
           return;
@@ -80,6 +80,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         lobby.removeClient(client.userId);
         client.leave(lobby.id);
         this.lobbyManager.clearLastLobbyForUser(client.userId);
+        client.emit(ServerEvents.LobbyLeave);
       } else {
         player.disconnected = true;
         lobby.pauseGame();

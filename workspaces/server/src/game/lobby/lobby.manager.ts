@@ -16,7 +16,22 @@ export class LobbyManager {
   private readonly lastKnownLobbyPerUser: Map<string, string> = new Map();
 
   public createLobby(owner: AuthenticatedSocket, user: any): Lobby {
+    const currentLobby = this.getLastLobbyForUser(owner.userId);
+
+    if (currentLobby) {
+      this.server.to(owner.id).emit(ServerEvents.LobbyError, {
+        error: 'Already in a lobby',
+        message: 'Vous êtes déjà dans une autre partie.',
+      });
+
+      throw new WsException('Already in a lobby');
+    }
+
     const lobby = new Lobby(this.server, owner);
+
+    this.server
+      .to(owner.id)
+      .emit(ServerEvents.LobbyCreate, { lobbyId: lobby.id });
 
     this.lobbies.set(lobby.id, lobby);
 
@@ -54,6 +69,17 @@ export class LobbyManager {
     client: AuthenticatedSocket,
     user: any,
   ): void {
+    const currentLobby = this.getLastLobbyForUser(client.userId);
+
+    if (currentLobby && currentLobby !== lobbyId) {
+      this.server.to(client.id).emit(ServerEvents.LobbyError, {
+        error: 'Already in a lobby',
+        message: 'Vous êtes déjà dans une autre partie.',
+      });
+
+      throw new WsException('Already in a lobby');
+    }
+
     const lobby = this.getLobby(client, lobbyId);
 
     if (lobby.clients.length >= 8) {
