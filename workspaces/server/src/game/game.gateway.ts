@@ -58,6 +58,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.token = token;
       const lastLobbyId = this.lobbyManager.getLastLobbyForUser(client.userId);
 
+      if (lastLobbyId) {
+        client.lobby = this.lobbyManager.getLobby(client, lastLobbyId);
+      }
+
       if (!this.playerConnections.has(client.userId)) {
         this.playerConnections.set(client.userId, new Set());
       }
@@ -74,15 +78,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(client: AuthenticatedSocket) {
-    if (!client.lobby) return;
-
-    const lobby = client.lobby;
-    const player = lobby.getPlayerById?.(client.userId);
-
     const connections = this.playerConnections.get(client.userId);
     if (!connections) return;
 
     connections.delete(client.id);
+
+    if (!client.lobby) return;
+
+    const lobby = client.lobby;
+    const player = lobby.getPlayerById?.(client.userId);
 
     if (connections.size === 0 && player) {
       if (lobby.stateLobby == LOBBY_STATES.IN_LOBBY) {
@@ -117,6 +121,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.userName = await this.authService.getUsername(token);
       client.token = token;
       const lastLobbyId = this.lobbyManager.getLastLobbyForUser(client.userId);
+
+      if (lastLobbyId) {
+        client.lobby = this.lobbyManager.getLobby(client, lastLobbyId);
+      }
 
       client.emit(ServerEvents.Authenticated, {
         userId: client.userId,

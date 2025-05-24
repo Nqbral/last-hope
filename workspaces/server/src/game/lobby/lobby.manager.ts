@@ -42,7 +42,7 @@ export class LobbyManager {
     return lobby;
   }
 
-  protected getLobby(client: AuthenticatedSocket, lobbyId: string): Lobby {
+  public getLobby(client: AuthenticatedSocket, lobbyId: string): Lobby {
     const lobby = this.lobbies.get(lobbyId);
 
     if (!lobby || lobby.stateLobby == LOBBY_STATES.GAME_DELETED) {
