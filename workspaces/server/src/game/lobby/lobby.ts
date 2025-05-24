@@ -127,6 +127,10 @@ export class Lobby {
     client.leave(this.id);
     client.emit(ServerEvents.LobbyLeave);
 
+    if (this.stateLobby !== LOBBY_STATES.IN_LOBBY) {
+      this.stateLobby = LOBBY_STATES.GAME_FINISHED_BY_LEAVING;
+    }
+
     this.dispatchLobbyState();
   }
 

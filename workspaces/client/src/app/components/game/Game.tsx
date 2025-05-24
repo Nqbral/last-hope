@@ -1,3 +1,4 @@
+import ModalFinishedByLeaving from '@components/modal/ModalFinishedByLeaving';
 import ModalPauseDisconnect from '@components/modal/ModalPauseDisconnect';
 import { LOBBY_STATES } from '@last-hope/shared/consts/LobbyStates';
 import { ServerEvents } from '@last-hope/shared/enums/ServerEvents';
@@ -19,6 +20,14 @@ export default function Game({ lobbyState }: Props) {
         aria-describedby="modal-disconnected-pause"
       >
         <ModalPauseDisconnect lobbyState={lobbyState} />
+      </Modal>
+      <Modal
+        open={lobbyState?.stateLobby == LOBBY_STATES.GAME_FINISHED_BY_LEAVING}
+        onClose={() => {}}
+        aria-labelledby="modal-finished-by-leaving"
+        aria-describedby="modal-finished-by-leaving"
+      >
+        <ModalFinishedByLeaving lobbyState={lobbyState} />
       </Modal>
 
       <div className="flex min-h-screen flex-col items-center justify-center">
