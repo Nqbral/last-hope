@@ -7,6 +7,8 @@ import { ServerPayloads } from '@shared/types/ServerPayloads';
 import { Server } from 'socket.io';
 import { v4 } from 'uuid';
 
+import { Instance } from '../instance/instance';
+
 const PLAYER_COLORS = [
   'amber-400',
   'red-400',
@@ -30,6 +32,8 @@ export class Lobby {
   public stateBeforePause: string = '';
 
   public players: Player[] = [];
+
+  public readonly instance: Instance = new Instance(this);
 
   constructor(
     private readonly server: Server,
@@ -88,18 +92,8 @@ export class Lobby {
     });
   }
 
-  public startGame(): void {
-    if (this.players.length < 4) {
-      throw new WsException('Not enough players to start the game.');
-    }
-
-    if (this.players.length > 8) {
-      throw new WsException('Too much players to start the game.');
-    }
-
-    this.stateLobby = LOBBY_STATES.GAME_STARTED;
-
-    this.dispatchLobbyState();
+  public startGame(client: AuthenticatedSocket): void {
+    this.instance.triggerStart(client);
   }
 
   public pauseGame(): void {
