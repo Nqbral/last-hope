@@ -1,6 +1,7 @@
 import ModalCheckingCards from '@components/modal/ModalCheckingCards';
 import ModalCheckingOtherPlayerCards from '@components/modal/ModalCheckingOtherPlayerCards';
 import ModalFinishedByLeaving from '@components/modal/ModalFinishedByLeaving';
+import ModalFinishedRound from '@components/modal/ModalFinishedRound';
 import ModalOtherPlayerCardDraw from '@components/modal/ModalOtherPlayerCardDraw';
 import ModalPauseDisconnect from '@components/modal/ModalPauseDisconnect';
 import ModalRecapRound from '@components/modal/ModalRecapRound';
@@ -127,6 +128,19 @@ export default function Game({ lobbyState, gameState }: Props) {
         aria-describedby="modal-recap-round"
       >
         <ModalRecapRound player={myPlayer} gameState={gameState} />
+      </Modal>
+
+      <Modal
+        open={
+          lobbyState?.stateLobby != LOBBY_STATES.GAME_PAUSED &&
+          lobbyState?.stateLobby != LOBBY_STATES.GAME_FINISHED_BY_LEAVING &&
+          gameState?.stateGame == GAME_STATES.GAME_FINISHED
+        }
+        onClose={() => {}}
+        aria-labelledby="modal-recap-game"
+        aria-describedby="modal-recap-game"
+      >
+        <ModalFinishedRound lobbyState={lobbyState} gameState={gameState} />
       </Modal>
 
       {/* TOAST CONTAINER */}

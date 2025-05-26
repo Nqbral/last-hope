@@ -52,6 +52,22 @@ export default function PlayerDisplay({
       return;
     }
 
+    if (player.hand.length == 0) {
+      toast(CustomNotification, {
+        data: {
+          title: 'Erreur',
+          content:
+            'Vous ne pouvez pas sélectionner un joueur qui a une main vide.',
+        },
+        hideProgressBar: true,
+        closeButton: false,
+        style: {
+          width: 300,
+        },
+      });
+      return;
+    }
+
     emitEvent(CLIENT_EVENTS.CHECKING_OTHER_CARDS, { idOtherPlayer: playerId });
   };
 

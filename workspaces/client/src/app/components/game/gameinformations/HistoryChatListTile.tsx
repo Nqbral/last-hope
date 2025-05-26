@@ -19,7 +19,7 @@ export default function HistoryChatListTile({ event }: Props) {
           <span className={`text-${event.playerInitEvent?.color}`}>
             {event.playerInitEvent?.userName}
           </span>{' '}
-          a neutralisé la carte{' '}
+          a tiré la carte{' '}
           <span className={`text-${event.cardDraw?.color}`}>
             {event.cardDraw?.nameCard}
           </span>{' '}
