@@ -1,3 +1,4 @@
+import ModalCheckingCards from '@components/modal/ModalCheckingCards';
 import ModalFinishedByLeaving from '@components/modal/ModalFinishedByLeaving';
 import ModalPauseDisconnect from '@components/modal/ModalPauseDisconnect';
 import ModalRoleDistribution from '@components/modal/ModalRoleDistribution';
@@ -53,6 +54,7 @@ export default function Game({ lobbyState, gameState }: Props) {
       <Modal
         open={
           lobbyState?.stateLobby != LOBBY_STATES.GAME_PAUSED &&
+          lobbyState?.stateLobby != LOBBY_STATES.GAME_FINISHED_BY_LEAVING &&
           gameState?.stateGame == GAME_STATES.ROLE_DISTRIBUTION
         }
         onClose={() => {}}
@@ -60,6 +62,19 @@ export default function Game({ lobbyState, gameState }: Props) {
         aria-describedby="modal-role-distribution"
       >
         <ModalRoleDistribution player={myPlayer} gameState={gameState} />
+      </Modal>
+
+      <Modal
+        open={
+          lobbyState?.stateLobby != LOBBY_STATES.GAME_PAUSED &&
+          lobbyState?.stateLobby != LOBBY_STATES.GAME_FINISHED_BY_LEAVING &&
+          gameState?.stateGame == GAME_STATES.CHECKING_CARDS
+        }
+        onClose={() => {}}
+        aria-labelledby="modal-role-distribution"
+        aria-describedby="modal-role-distribution"
+      >
+        <ModalCheckingCards player={myPlayer} gameState={gameState} />
       </Modal>
 
       <div className="flex min-h-screen flex-col items-center justify-center">

@@ -1,5 +1,5 @@
 import PrimaryButton from '@components/buttons/PrimaryButton';
-import RoleImage from '@components/images/RoleImage';
+import CardImage from '@components/images/CardImage';
 import { useSocket } from '@contexts/SocketContext';
 import { Player } from '@last-hope/shared/classes/Player';
 import { CLIENT_EVENTS } from '@last-hope/shared/consts/ClientEvents';
@@ -15,7 +15,7 @@ type Props = {
   gameState: ServerPayloads[ServerEvents.GameState] | null;
 };
 
-export default function ModalRoleDistribution({ player, gameState }: Props) {
+export default function ModalCheckingCards({ player, gameState }: Props) {
   const [playersNotReady, setPlayersNotReady] = useState<Player[]>([]);
   const { emitEvent } = useSocket();
 
@@ -33,20 +33,23 @@ export default function ModalRoleDistribution({ player, gameState }: Props) {
     <ModalTemplate>
       <div className="flex flex-col items-center gap-6 text-center">
         <h2 className="text-secondary-hover pb-2 text-2xl">
-          Distribution des rôles
+          Vérification des cartes
         </h2>
         {player != undefined && (
-          <>
-            <div>
-              Vous êtes un{' '}
-              <span className={`text-${player.role?.color}`}>
-                {player.role?.nameRole}
-              </span>
-              .
+          <div className="flex flex-col items-center gap-4">
+            <div>Votre main</div>
+            <div className="flex flex-row items-center justify-center gap-2">
+              {player.hand.map((card, index) => {
+                return (
+                  <CardImage
+                    key={`card-player-${index}`}
+                    card={card}
+                    showText={true}
+                  />
+                );
+              })}
             </div>
-            <RoleImage role={player.role} />
-            <div>{player.role?.goal}</div>
-          </>
+          </div>
         )}
         <div>En attente de :</div>
         <div>

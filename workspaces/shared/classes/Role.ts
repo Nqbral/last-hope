@@ -3,7 +3,6 @@ export class Role {
 
   constructor(
     public readonly nameRole: string,
-    public readonly image: string,
     public readonly color: string
   ) {}
 }

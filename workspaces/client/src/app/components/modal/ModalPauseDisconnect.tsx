@@ -34,25 +34,27 @@ export default function ModalPauseDisconnect({ lobbyState }: Props) {
           {playersDisconnected.map((playerDisconnected, index) => {
             if (index == 0) {
               return (
-                <span
+                <div
                   key={`player-disconnected-${playerDisconnected.userId}`}
-                  className={`text-${playerDisconnected.color}`}
+                  className="inline-block"
                 >
-                  {playerDisconnected.userName}
-                </span>
+                  <span className={`text-${playerDisconnected.color}`}>
+                    {playerDisconnected.userName}
+                  </span>
+                </div>
               );
             }
 
             return (
-              <>
+              <div
+                key={`player-disconnected-${playerDisconnected.userId}`}
+                className="inline-block"
+              >
                 {', '}
-                <span
-                  key={`player-disconnected-${playerDisconnected.userId}`}
-                  className={`text-${playerDisconnected.color}`}
-                >
+                <span className={`text-${playerDisconnected.color}`}>
                   {playerDisconnected.userName}
                 </span>
-              </>
+              </div>
             );
           })}
         </div>
