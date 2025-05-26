@@ -5,4 +5,7 @@ export const CLIENT_EVENTS = {
   LOBBY_START_GAME: "client.lobby.start.game",
   LOBBY_LEAVE: "client.lobby.leave",
   LOBBY_DELETE: "client.lobby.delete",
+
+  // Game
+  GAME_READY: "client.game.ready",
 } as const;

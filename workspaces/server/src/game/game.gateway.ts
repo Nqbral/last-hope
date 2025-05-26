@@ -206,4 +206,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.lobbyManager.deleteLobby(client, lobby.id);
   }
+
+  @UseGuards(JwtWsGuard)
+  @SubscribeMessage(CLIENT_EVENTS.GAME_READY)
+  onGameReady(@ConnectedSocket() client: AuthenticatedSocket) {
+    const lobby = client.lobby;
+
+    if (!lobby) throw new WsException('Lobby introuvable');
+
+    lobby.instance.onGameReady(client);
+  }
 }

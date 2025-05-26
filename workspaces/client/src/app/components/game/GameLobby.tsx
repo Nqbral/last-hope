@@ -48,7 +48,7 @@ export default function GameLobby({ lobbyState }: Props) {
         <h2 className="mb-2 text-lg">Liste des joueurs</h2>
         {lobbyState?.players.map((player, index) => {
           return (
-            <div key={`player_lobby_${index}`}>
+            <div key={`player_${index}`}>
               {index + 1}.{' '}
               <span className={`text-${player.color}`}>{player.userName}</span>
             </div>

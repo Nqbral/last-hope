@@ -17,4 +17,12 @@ export type ServerPayloads = {
     error: string;
     message: string;
   };
+
+  [ServerEvents.GameState]: {
+    lobbyId: string;
+    stateGame: string;
+    roundNumber: number;
+    players: Player[];
+    remediesToFind: number;
+  };
 };

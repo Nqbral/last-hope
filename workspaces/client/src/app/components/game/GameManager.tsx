@@ -1,5 +1,6 @@
 'use client';
 
+import Navbar from '@components/navbar/Navbar';
 import { useSocket } from '@contexts/SocketContext';
 import { CLIENT_EVENTS } from '@last-hope/shared/consts/ClientEvents';
 import { LOBBY_STATES } from '@last-hope/shared/consts/LobbyStates';
@@ -8,6 +9,7 @@ import { ServerPayloads } from '@last-hope/shared/types/ServerPayloads';
 import { Listener } from '@lib/SocketManager';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Triangle } from 'react-loader-spinner';
 
 import Game from './Game';
 import GameLobby from './GameLobby';
@@ -19,6 +21,7 @@ export default function GameManager() {
   const { isConnectedSocket, addListener, removeListener, emitEvent } =
     useSocket();
   const [hasJoined, setHasJoined] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [lobbyError, setLobbyError] = useState<
     ServerPayloads[ServerEvents.LobbyError]
   >({ error: '', message: '' });
@@ -30,6 +33,15 @@ export default function GameManager() {
     stateLobby: '',
     players: [],
   });
+  const [gameState, setGameState] = useState<
+    ServerPayloads[ServerEvents.GameState]
+  >({
+    lobbyId: '',
+    stateGame: '',
+    players: [],
+    roundNumber: 1,
+    remediesToFind: 1,
+  });
 
   useEffect(() => {
     if (!isConnectedSocket) {
@@ -40,25 +52,38 @@ export default function GameManager() {
       data,
     ) => {
       setLobbyState(data);
+      setLoading(false);
+    };
+
+    const onGameState: Listener<ServerPayloads[ServerEvents.GameState]> = (
+      data,
+    ) => {
+      setGameState(data);
     };
 
     const onLobbyError: Listener<ServerPayloads[ServerEvents.LobbyError]> = (
       data,
     ) => {
       setLobbyError(data);
+      setLoading(false);
     };
 
     addListener(ServerEvents.LobbyState, onLobbyState);
+    addListener(ServerEvents.GameState, onGameState);
     addListener(ServerEvents.LobbyError, onLobbyError);
 
     return () => {
       removeListener(ServerEvents.LobbyState, onLobbyState);
+      removeListener(ServerEvents.GameState, onGameState);
       removeListener(ServerEvents.LobbyError, onLobbyError);
     };
   }, [isConnectedSocket, addListener, removeListener]);
 
   useEffect(() => {
-    if (!isConnectedSocket || hasJoined) return;
+    if (!isConnectedSocket || hasJoined) {
+      setLoading(false);
+      return;
+    }
 
     const lobbyIdJoin = searchParams.get('lobby');
 
@@ -70,6 +95,23 @@ export default function GameManager() {
 
   if (lobbyError.error != '') {
     return <GameLobbyError error={lobbyError} />;
+  }
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="flex min-h-screen w-full flex-col items-center justify-center">
+          <Triangle
+            visible={true}
+            height="80"
+            width="80"
+            color="#2F9966"
+            ariaLabel="three-dots-loading"
+          />
+        </div>
+      </>
+    );
   }
 
   if (lobbyState.lobbyId == '') {
@@ -92,5 +134,5 @@ export default function GameManager() {
     }
   }
 
-  return <Game lobbyState={lobbyState} />;
+  return <Game lobbyState={lobbyState} gameState={gameState} />;
 }

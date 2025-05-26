@@ -93,6 +93,10 @@ export class LobbyManager {
     this.lastKnownLobbyPerUser.set(client.userId, lobby.id);
 
     lobby.addClient(client);
+
+    if (lobby.stateLobby != LOBBY_STATES.IN_LOBBY) {
+      lobby.instance.dispatchGameState();
+    }
   }
 
   public deleteLobby(client: AuthenticatedSocket, lobbyId: string): void {

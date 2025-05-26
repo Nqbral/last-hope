@@ -1,6 +1,5 @@
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
-import { WsException } from '@nestjs/websockets';
-import { Player } from '@shared/classes/player';
+import { Player } from '@shared/classes/Player';
 import { LOBBY_STATES } from '@shared/consts/LobbyStates';
 import { ServerEvents } from '@shared/enums/ServerEvents';
 import { ServerPayloads } from '@shared/types/ServerPayloads';

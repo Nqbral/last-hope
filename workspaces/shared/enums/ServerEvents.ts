@@ -8,4 +8,7 @@ export enum ServerEvents {
   LobbyCreate = "server.lobby.create",
   LobbyJoin = "server.lobby.join",
   LobbyLeave = "server.lobby.leave",
+
+  // Game
+  GameState = "server.game.state",
 }
