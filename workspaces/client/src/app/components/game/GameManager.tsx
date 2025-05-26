@@ -43,6 +43,9 @@ export default function GameManager() {
     remediesToFind: 1,
     playerTurn: null,
     checkedPlayerHand: null,
+    cardsDisplayedRound: [],
+    remediesFound: 0,
+    statusFinish: '',
   });
 
   useEffect(() => {

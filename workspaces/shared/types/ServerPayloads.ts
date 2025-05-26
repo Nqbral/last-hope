@@ -1,5 +1,6 @@
 import { ServerEvents } from "../enums/ServerEvents";
 import { Player } from "../classes/Player";
+import { Card } from "../classes/Card";
 
 export type ServerPayloads = {
   [ServerEvents.LobbyCreate]: {
@@ -26,5 +27,8 @@ export type ServerPayloads = {
     remediesToFind: number;
     playerTurn: Player | null;
     checkedPlayerHand: Player | null;
+    cardsDisplayedRound: Card[];
+    remediesFound: number;
+    statusFinish: string;
   };
 };

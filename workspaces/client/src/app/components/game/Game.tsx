@@ -1,7 +1,9 @@
 import ModalCheckingCards from '@components/modal/ModalCheckingCards';
 import ModalCheckingOtherPlayerCards from '@components/modal/ModalCheckingOtherPlayerCards';
 import ModalFinishedByLeaving from '@components/modal/ModalFinishedByLeaving';
+import ModalOtherPlayerCardDraw from '@components/modal/ModalOtherPlayerCardDraw';
 import ModalPauseDisconnect from '@components/modal/ModalPauseDisconnect';
+import ModalRecapRound from '@components/modal/ModalRecapRound';
 import ModalRoleDistribution from '@components/modal/ModalRoleDistribution';
 import { useSocket } from '@contexts/SocketContext';
 import { Player } from '@last-hope/shared/classes/Player';
@@ -13,6 +15,8 @@ import { Modal } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Slide, ToastContainer } from 'react-toastify';
 
+import DrawedCardsRound from './DrawedCardRound';
+import FoundRemedies from './FoundRemedies';
 import GameInformations from './GameInformations';
 import PlayersDisplay from './PlayersDisplay';
 import RoundInformations from './RoundInformations';
@@ -99,15 +103,43 @@ export default function Game({ lobbyState, gameState }: Props) {
         />
       </Modal>
 
+      <Modal
+        open={
+          lobbyState?.stateLobby != LOBBY_STATES.GAME_PAUSED &&
+          lobbyState?.stateLobby != LOBBY_STATES.GAME_FINISHED_BY_LEAVING &&
+          gameState?.stateGame == GAME_STATES.OTHER_PLAYER_CARD_DRAW
+        }
+        onClose={() => {}}
+        aria-labelledby="modal-other-player-card-draw"
+        aria-describedby="modal-other-player-card-draw"
+      >
+        <ModalOtherPlayerCardDraw gameState={gameState} />
+      </Modal>
+
+      <Modal
+        open={
+          lobbyState?.stateLobby != LOBBY_STATES.GAME_PAUSED &&
+          lobbyState?.stateLobby != LOBBY_STATES.GAME_FINISHED_BY_LEAVING &&
+          gameState?.stateGame == GAME_STATES.RECAP_ROUND
+        }
+        onClose={() => {}}
+        aria-labelledby="modal-recap-round"
+        aria-describedby="modal-recap-round"
+      >
+        <ModalRecapRound player={myPlayer} gameState={gameState} />
+      </Modal>
+
       {/* TOAST CONTAINER */}
       <ToastContainer transition={Slide} />
 
       {/* GAME */}
-      <div className="flex min-h-screen w-full flex-row pt-24">
+      <div className="flex min-h-screen w-full flex-row pt-20">
         <GameInformations player={myPlayer} gameState={gameState} />
         <div className="flex w-full flex-col items-center gap-8">
           <RoundInformations gameState={gameState} player={myPlayer} />
           <PlayersDisplay gameState={gameState} myPlayer={myPlayer} />
+          <DrawedCardsRound gameState={gameState} />
+          <FoundRemedies gameState={gameState} />
         </div>
       </div>
     </>

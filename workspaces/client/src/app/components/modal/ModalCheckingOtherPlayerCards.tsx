@@ -45,6 +45,12 @@ export default function ModalCheckingOtherPlayerCards({
     emitEvent(CLIENT_EVENTS.BACK_TO_PLAYER_TURN, undefined);
   };
 
+  const selectCardToDraw = (indexCardToDraw: number) => {
+    emitEvent(CLIENT_EVENTS.DRAW_OTHER_PLAYER_CARD, {
+      indexCardDraw: indexCardToDraw,
+    });
+  };
+
   return (
     <ModalTemplate>
       <div className="flex flex-col items-center gap-6 text-center">
@@ -90,7 +96,7 @@ export default function ModalCheckingOtherPlayerCards({
                     key={`backcard-player-checked-${index}`}
                     className="w-24 transition-transform hover:scale-105"
                     onClick={() => {
-                      console.log('CLICK');
+                      selectCardToDraw(index);
                     }}
                   />
                 );

@@ -9,5 +9,6 @@ export const CLIENT_EVENTS = {
   // Game
   GAME_READY: "client.game.ready",
   BACK_TO_PLAYER_TURN: "client.game.back.to.player.turn",
-  CHECKING_OTHER_CARDS: "client.game.checking_other_cards",
+  CHECKING_OTHER_CARDS: "client.game.checking_other.cards",
+  DRAW_OTHER_PLAYER_CARD: "client.game.draw.other.player.card",
 } as const;

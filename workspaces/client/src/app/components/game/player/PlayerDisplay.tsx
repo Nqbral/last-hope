@@ -70,7 +70,7 @@ export default function PlayerDisplay({
             alt={`img-backcard-player-${player.userId}-${index}`}
             className="absolute top-0 left-0 w-24"
             style={{
-              transform: `translateX(${index * offset * 4}px)`,
+              transform: `translateX(${index * offset * 4 + 4 * (5 - player.hand.length)}px)`,
               zIndex: index,
             }}
           />

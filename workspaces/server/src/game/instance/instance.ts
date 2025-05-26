@@ -8,20 +8,25 @@ import { NeutralCard } from '@shared/classes/cards/NeutralCard';
 import { RemedyCard } from '@shared/classes/cards/RemedyCard';
 import { DoctorRole } from '@shared/classes/roles/DoctorRole';
 import { InfectedRole } from '@shared/classes/roles/InfectedRole';
+import { GAME_FINISH_STATUSES } from '@shared/consts/GameFinishStatuses';
 import { GAME_STATES } from '@shared/consts/GameStates';
 import { LOBBY_STATES } from '@shared/consts/LobbyStates';
+import { NAME_CARD } from '@shared/consts/NameCard';
 import { ServerEvents } from '@shared/enums/ServerEvents';
 import { ServerPayloads } from '@shared/types/ServerPayloads';
 
 import { Lobby } from '../lobby/lobby';
 
 export class Instance {
-  public stateGame: string = '';
-  public roundNumber: number = 1;
-  public nbRemediesToFind: number = 0;
-  public deck: Card[] = [];
-  public playerTurn: Player | null = null;
-  public checkedPlayerHand: Player | null = null;
+  private stateGame: string = '';
+  private roundNumber: number = 1;
+  private nbRemediesToFind: number = 0;
+  private deck: Card[] = [];
+  private playerTurn: Player | null = null;
+  private checkedPlayerHand: Player | null = null;
+  private cardsDisplayedRound: Card[] = [];
+  private remediesFound: number = 0;
+  private statusFinish: string = '';
 
   constructor(private readonly lobby: Lobby) {}
 
@@ -38,14 +43,29 @@ export class Instance {
       throw new WsException('Too much players to start the game.');
     }
 
-    this.lobby.stateLobby = LOBBY_STATES.GAME_STARTED;
+    this.stateGame = GAME_STATES.ROLE_DISTRIBUTION;
+    this.roundNumber = 1;
     this.nbRemediesToFind = this.lobby.players.length;
     this.initRoles();
+    this.deck = [];
     this.selectRandomPlayerTurn();
-    this.roundNumber = 1;
-    this.stateGame = GAME_STATES.ROLE_DISTRIBUTION;
+    this.checkedPlayerHand = null;
+    this.cardsDisplayedRound = [];
+    this.remediesFound = 0;
+    this.statusFinish = '';
 
-    this.lobby.dispatchLobbyState();
+    if (this.lobby.stateLobby != LOBBY_STATES.GAME_STARTED) {
+      this.lobby.stateLobby = LOBBY_STATES.GAME_STARTED;
+      this.lobby.dispatchLobbyState();
+    }
+
+    this.dispatchGameState();
+  }
+
+  private triggerFinish(statusFinish: string) {
+    this.stateGame = GAME_STATES.GAME_FINISHED;
+    this.statusFinish = statusFinish;
+
     this.dispatchGameState();
   }
 
@@ -174,6 +194,9 @@ export class Instance {
       case GAME_STATES.CHECKING_CARDS:
         this.switchToPlayerTurnState();
         break;
+      case GAME_STATES.RECAP_ROUND:
+        this.switchToNextRound();
+        break;
       default:
         throw new WsException('Game state not handled');
     }
@@ -197,6 +220,25 @@ export class Instance {
     this.stateGame = GAME_STATES.PLAYER_TURN;
 
     this.lobby.players.forEach((p) => (p.hand = this.shuffle(p.hand)));
+  }
+
+  private switchToNextRound(): void {
+    this.stateGame = GAME_STATES.CHECKING_CARDS;
+    this.deck = [];
+    this.cardsDisplayedRound = [];
+
+    this.lobby.players.forEach((player) => {
+      player.hand.forEach((card) => {
+        this.deck.push(card);
+      });
+      player.hand = [];
+      player.ready = false;
+    });
+
+    this.deck = this.shuffle(this.deck);
+
+    this.dealCards();
+    this.lobby.players.forEach((p) => p.orderCards());
   }
 
   private findPlayerOnUserId(userId: string): Player {
@@ -230,14 +272,82 @@ export class Instance {
   }
 
   public onBackToPlayerTurn(client: AuthenticatedSocket): void {
-    this.checkedPlayerHand = null;
-
     if (client.userId != this.playerTurn?.userId) {
       throw new WsException('Not player turn.');
     }
 
+    this.checkedPlayerHand = null;
+
     this.stateGame = GAME_STATES.PLAYER_TURN;
 
+    this.dispatchGameState();
+  }
+
+  public onDrawOtherPlayerCard(
+    client: AuthenticatedSocket,
+    indexCardDraw: number,
+  ): void {
+    if (client.userId != this.playerTurn?.userId) {
+      throw new WsException('Not player turn.');
+    }
+
+    if (this.checkedPlayerHand != null) {
+      if (
+        indexCardDraw < 0 ||
+        indexCardDraw >= this.checkedPlayerHand.hand.length
+      ) {
+        throw new WsException('Index card draw incorrect.');
+      }
+
+      const cardDraw = this.checkedPlayerHand.hand[indexCardDraw];
+      cardDraw.displayedCard = true;
+
+      if (cardDraw.nameCard == NAME_CARD.REMEDY) {
+        this.remediesFound++;
+      }
+
+      if (this.remediesFound >= this.nbRemediesToFind) {
+        this.triggerFinish(GAME_FINISH_STATUSES.DOCTORS_WIN);
+        return;
+      }
+
+      if (cardDraw.nameCard == NAME_CARD.BOMB) {
+        this.triggerFinish(GAME_FINISH_STATUSES.INFECTED_WIN_BY_BOMB);
+        return;
+      }
+
+      this.stateGame = GAME_STATES.OTHER_PLAYER_CARD_DRAW;
+      this.dispatchGameState();
+
+      setTimeout(() => {
+        this.setPlayerNextTurn(indexCardDraw, cardDraw);
+      }, 5000);
+    }
+
+    throw new WsException('checkedPlayerHand not ok.');
+  }
+
+  private setPlayerNextTurn(indexCardDraw: number, cardDraw: Card) {
+    this.cardsDisplayedRound.push(cardDraw);
+    this.checkedPlayerHand?.hand.splice(indexCardDraw, 1);
+    this.playerTurn = this.checkedPlayerHand;
+    this.checkedPlayerHand = null;
+
+    if (this.cardsDisplayedRound.length >= this.lobby.players.length) {
+      this.roundNumber++;
+
+      if (this.roundNumber >= 5) {
+        this.triggerFinish(GAME_FINISH_STATUSES.INFECTED_WIN_BY_TIME);
+        return;
+      }
+
+      this.stateGame = GAME_STATES.RECAP_ROUND;
+      this.lobby.players.forEach((p) => (p.ready = false));
+      this.dispatchGameState();
+      return;
+    }
+
+    this.stateGame = GAME_STATES.PLAYER_TURN;
     this.dispatchGameState();
   }
 
@@ -252,6 +362,9 @@ export class Instance {
       remediesToFind: this.nbRemediesToFind,
       playerTurn: this.playerTurn,
       checkedPlayerHand: this.checkedPlayerHand,
+      cardsDisplayedRound: this.cardsDisplayedRound,
+      remediesFound: this.remediesFound,
+      statusFinish: this.statusFinish,
     };
 
     this.lobby.dispatchToLobby(ServerEvents.GameState, payload);
