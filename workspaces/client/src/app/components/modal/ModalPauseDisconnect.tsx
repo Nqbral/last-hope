@@ -4,6 +4,7 @@ import { Player } from '@last-hope/shared/classes/Player';
 import { CLIENT_EVENTS } from '@last-hope/shared/consts/ClientEvents';
 import { ServerEvents } from '@last-hope/shared/enums/ServerEvents';
 import { ServerPayloads } from '@last-hope/shared/types/ServerPayloads';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import ModalTemplate from './ModalTemplate';
@@ -16,8 +17,13 @@ export default function ModalPauseDisconnect({ lobbyState }: Props) {
   const { userId, emitEvent } = useSocket();
   const [playersDisconnected, setPlayersDisconnected] = useState<Player[]>([]);
   const isOwner = userId === lobbyState?.ownerId;
+  const router = useRouter();
 
   const handleDelete = () => emitEvent(CLIENT_EVENTS.LOBBY_DELETE, undefined);
+  const handleLeave = () => {
+    emitEvent(CLIENT_EVENTS.LOBBY_LEAVE, undefined);
+    router.push('/lobby');
+  };
 
   useEffect(() => {
     if (lobbyState != null) {
@@ -58,8 +64,10 @@ export default function ModalPauseDisconnect({ lobbyState }: Props) {
             );
           })}
         </div>
-        {isOwner && (
+        {isOwner ? (
           <RedButton buttonText="Supprimer le lobby" onClick={handleDelete} />
+        ) : (
+          <RedButton buttonText="Quitter le lobby" onClick={handleLeave} />
         )}
       </div>
     </ModalTemplate>
