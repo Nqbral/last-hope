@@ -169,7 +169,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new WsException("Vous n'êtes pas le propriétaire du lobby.");
     }
 
-    lobby.startGame();
+    lobby.startGame(client);
   }
 
   @UseGuards(JwtWsGuard)
