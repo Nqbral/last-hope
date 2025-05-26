@@ -41,6 +41,8 @@ export default function GameManager() {
     players: [],
     roundNumber: 1,
     remediesToFind: 1,
+    playerTurn: null,
+    checkedPlayerHand: null,
   });
 
   useEffect(() => {

@@ -10,4 +10,6 @@ export type ClientSocketEvents = {
 
   // Game
   [CLIENT_EVENTS.GAME_READY]: undefined;
+  [CLIENT_EVENTS.BACK_TO_PLAYER_TURN]: undefined;
+  [CLIENT_EVENTS.CHECKING_OTHER_CARDS]: { idOtherPlayer: string };
 };

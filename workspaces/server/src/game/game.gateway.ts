@@ -22,7 +22,7 @@ import { LOBBY_STATES } from '@shared/consts/LobbyStates';
 import { ServerEvents } from '@shared/enums/ServerEvents';
 import { Server } from 'socket.io';
 
-import { LobbyJoinDto } from './lobby/dtos';
+import { CheckingOtherHandDto, LobbyJoinDto } from './lobby/dtos';
 
 @WebSocketGateway()
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -215,5 +215,31 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!lobby) throw new WsException('Lobby introuvable');
 
     lobby.instance.onGameReady(client);
+  }
+
+  @UseGuards(JwtWsGuard)
+  @SubscribeMessage(CLIENT_EVENTS.CHECKING_OTHER_CARDS)
+  onCheckingOtherHand(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: CheckingOtherHandDto,
+  ) {
+    const lobby = client.lobby;
+
+    if (!lobby) throw new WsException('Lobby introuvable');
+
+    lobby.instance.onCheckingOtherHand(client, data.idOtherPlayer);
+  }
+
+  @UseGuards(JwtWsGuard)
+  @SubscribeMessage(CLIENT_EVENTS.BACK_TO_PLAYER_TURN)
+  onBackToPlayerTurn(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: CheckingOtherHandDto,
+  ) {
+    const lobby = client.lobby;
+
+    if (!lobby) throw new WsException('Lobby introuvable');
+
+    lobby.instance.onBackToPlayerTurn(client);
   }
 }

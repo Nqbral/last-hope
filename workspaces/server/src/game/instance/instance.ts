@@ -20,6 +20,8 @@ export class Instance {
   public roundNumber: number = 1;
   public nbRemediesToFind: number = 0;
   public deck: Card[] = [];
+  public playerTurn: Player | null = null;
+  public checkedPlayerHand: Player | null = null;
 
   constructor(private readonly lobby: Lobby) {}
 
@@ -39,6 +41,7 @@ export class Instance {
     this.lobby.stateLobby = LOBBY_STATES.GAME_STARTED;
     this.nbRemediesToFind = this.lobby.players.length;
     this.initRoles();
+    this.selectRandomPlayerTurn();
     this.roundNumber = 1;
     this.stateGame = GAME_STATES.ROLE_DISTRIBUTION;
 
@@ -137,8 +140,14 @@ export class Instance {
     return array;
   }
 
+  private selectRandomPlayerTurn(): void {
+    let randomIndex = Math.floor(Math.random() * this.lobby.players.length);
+
+    this.playerTurn = this.lobby.players[randomIndex];
+  }
+
   public onGameReady(client: AuthenticatedSocket): void {
-    let player = this.findPlayerOnClient(client);
+    let player = this.findPlayerOnUserId(client.userId);
 
     player.ready = true;
 
@@ -163,7 +172,7 @@ export class Instance {
         this.switchToCheckingCardsState();
         break;
       case GAME_STATES.CHECKING_CARDS:
-        this.switchToInRoundState();
+        this.switchToPlayerTurnState();
         break;
       default:
         throw new WsException('Game state not handled');
@@ -184,22 +193,52 @@ export class Instance {
     this.lobby.players.forEach((p) => p.orderCards());
   }
 
-  private switchToInRoundState(): void {
-    this.stateGame = GAME_STATES.IN_ROUND;
+  private switchToPlayerTurnState(): void {
+    this.stateGame = GAME_STATES.PLAYER_TURN;
 
     this.lobby.players.forEach((p) => (p.hand = this.shuffle(p.hand)));
   }
 
-  private findPlayerOnClient(client: AuthenticatedSocket): Player {
-    let player = this.lobby.players.find(
-      (player) => player.userId == client.userId,
-    );
+  private findPlayerOnUserId(userId: string): Player {
+    let player = this.lobby.players.find((player) => player.userId == userId);
 
     if (player == undefined) {
       throw new WsException('Player not found in lobby');
     }
 
     return player;
+  }
+
+  public onCheckingOtherHand(
+    client: AuthenticatedSocket,
+    idPlayer: string,
+  ): void {
+    this.checkedPlayerHand = null;
+
+    if (client.userId != this.playerTurn?.userId) {
+      throw new WsException('Not player turn.');
+    }
+
+    if (client.userId == idPlayer) {
+      throw new WsException("Can't check your own hand.");
+    }
+
+    this.checkedPlayerHand = this.findPlayerOnUserId(idPlayer);
+    this.stateGame = GAME_STATES.CHECKING_OTHER_PLAYER_CARDS;
+
+    this.dispatchGameState();
+  }
+
+  public onBackToPlayerTurn(client: AuthenticatedSocket): void {
+    this.checkedPlayerHand = null;
+
+    if (client.userId != this.playerTurn?.userId) {
+      throw new WsException('Not player turn.');
+    }
+
+    this.stateGame = GAME_STATES.PLAYER_TURN;
+
+    this.dispatchGameState();
   }
 
   public dispatchGameState(): void {
@@ -211,6 +250,8 @@ export class Instance {
       roundNumber: this.roundNumber,
       players: this.lobby.players,
       remediesToFind: this.nbRemediesToFind,
+      playerTurn: this.playerTurn,
+      checkedPlayerHand: this.checkedPlayerHand,
     };
 
     this.lobby.dispatchToLobby(ServerEvents.GameState, payload);

@@ -24,5 +24,7 @@ export type ServerPayloads = {
     roundNumber: number;
     players: Player[];
     remediesToFind: number;
+    playerTurn: Player | null;
+    checkedPlayerHand: Player | null;
   };
 };
