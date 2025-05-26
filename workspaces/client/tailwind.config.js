@@ -16,6 +16,7 @@ module.exports = {
     'text-purple-400',
     'text-cyan-400',
     'text-rose-950',
+    'text-neutral-400',
   ],
   plugins: [],
 };

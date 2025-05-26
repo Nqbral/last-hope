@@ -3,6 +3,6 @@ import { Card } from "../Card";
 
 export class RemedyCard extends Card {
   constructor() {
-    super(NAME_CARD.REMEDY);
+    super(NAME_CARD.REMEDY, "emerald-400");
   }
 }

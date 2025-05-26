@@ -46,6 +46,7 @@ export default function GameManager() {
     cardsDisplayedRound: [],
     remediesFound: 0,
     statusFinish: '',
+    historyEvents: [],
   });
 
   useEffect(() => {

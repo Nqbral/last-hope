@@ -3,6 +3,6 @@ import { Card } from "../Card";
 
 export class NeutralCard extends Card {
   constructor() {
-    super(NAME_CARD.NEUTRAL);
+    super(NAME_CARD.NEUTRAL, "neutral-400");
   }
 }

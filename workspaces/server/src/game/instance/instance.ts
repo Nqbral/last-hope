@@ -1,11 +1,14 @@
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
 import { WsException } from '@nestjs/websockets';
 import { Card } from '@shared/classes/Card';
+import { HistoryEvent } from '@shared/classes/HistoryEvent';
 import { Player } from '@shared/classes/Player';
 import { Role } from '@shared/classes/Role';
 import { BombCard } from '@shared/classes/cards/BombCard';
 import { NeutralCard } from '@shared/classes/cards/NeutralCard';
 import { RemedyCard } from '@shared/classes/cards/RemedyCard';
+import { NextRoundHistoryEvent } from '@shared/classes/historyevents/NextRoundHistoryEvent';
+import { PickCardHistoryEvent } from '@shared/classes/historyevents/PickCardHistoryEvent';
 import { DoctorRole } from '@shared/classes/roles/DoctorRole';
 import { InfectedRole } from '@shared/classes/roles/InfectedRole';
 import { GAME_FINISH_STATUSES } from '@shared/consts/GameFinishStatuses';
@@ -27,6 +30,7 @@ export class Instance {
   private cardsDisplayedRound: Card[] = [];
   private remediesFound: number = 0;
   private statusFinish: string = '';
+  private historyEvents: HistoryEvent[] = [];
 
   constructor(private readonly lobby: Lobby) {}
 
@@ -53,6 +57,9 @@ export class Instance {
     this.cardsDisplayedRound = [];
     this.remediesFound = 0;
     this.statusFinish = '';
+    this.historyEvents = [];
+
+    this.historyEvents.push(new NextRoundHistoryEvent(this.roundNumber));
 
     if (this.lobby.stateLobby != LOBBY_STATES.GAME_STARTED) {
       this.lobby.stateLobby = LOBBY_STATES.GAME_STARTED;
@@ -239,6 +246,8 @@ export class Instance {
 
     this.dealCards();
     this.lobby.players.forEach((p) => p.orderCards());
+
+    this.historyEvents.push(new NextRoundHistoryEvent(this.roundNumber));
   }
 
   private findPlayerOnUserId(userId: string): Player {
@@ -301,6 +310,14 @@ export class Instance {
 
       const cardDraw = this.checkedPlayerHand.hand[indexCardDraw];
       cardDraw.displayedCard = true;
+
+      this.historyEvents.push(
+        new PickCardHistoryEvent(
+          this.playerTurn,
+          this.checkedPlayerHand,
+          cardDraw,
+        ),
+      );
 
       if (cardDraw.nameCard == NAME_CARD.REMEDY) {
         this.remediesFound++;
@@ -365,6 +382,7 @@ export class Instance {
       cardsDisplayedRound: this.cardsDisplayedRound,
       remediesFound: this.remediesFound,
       statusFinish: this.statusFinish,
+      historyEvents: this.historyEvents,
     };
 
     this.lobby.dispatchToLobby(ServerEvents.GameState, payload);
