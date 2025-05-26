@@ -1,7 +1,7 @@
 import { HistoryEvent } from '@last-hope/shared/classes/HistoryEvent';
 import { ServerEvents } from '@last-hope/shared/enums/ServerEvents';
 import { ServerPayloads } from '@last-hope/shared/types/ServerPayloads';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import HistoryChatListTile from './HistoryChatListTile';
 
@@ -11,12 +11,17 @@ type Props = {
 
 export default function HistoryChat({ gameState }: Props) {
   const [historyEvents, setHistoryEvents] = useState<HistoryEvent[]>([]);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (gameState != null) {
       setHistoryEvents(gameState.historyEvents);
     }
   }, [gameState]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [historyEvents]);
 
   return (
     <div className="flex h-[400px] w-72 flex-col overflow-hidden rounded-lg bg-neutral-900">
@@ -29,6 +34,7 @@ export default function HistoryChat({ gameState }: Props) {
             key={`history-event-${index}`}
           />
         ))}
+        <div ref={bottomRef} />
       </ul>
     </div>
   );
