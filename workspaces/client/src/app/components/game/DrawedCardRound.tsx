@@ -18,7 +18,7 @@ export default function DrawedCardsRound({ gameState }: Props) {
   }, [gameState]);
 
   return (
-    <div className="border-sm flex min-h-[150px] min-w-80 flex-col items-center gap-4 border-1 border-neutral-800 py-4 sm:min-h-[190px] sm:min-w-96 md:min-h-[220px] md:min-w-2xl lg:min-h-[250px] lg:min-w-3xl">
+    <div className="border-sm flex min-h-[150px] min-w-80 flex-col items-center gap-4 border-1 border-neutral-800 py-4 sm:min-h-[190px] sm:min-w-96 md:min-h-[220px] md:min-w-xl lg:min-h-[250px] lg:min-w-2xl">
       <div className="text-sm sm:text-base md:text-lg lg:text-xl">
         Carte(s) neutralisée(s) dans la manche
       </div>

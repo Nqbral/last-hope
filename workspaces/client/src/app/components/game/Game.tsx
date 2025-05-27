@@ -173,7 +173,7 @@ export default function Game({ lobbyState, gameState }: Props) {
           <Menu size={28} />
         </button>
 
-        <div className="hidden h-full min-w-96 pl-4 lg:flex">
+        <div className="hidden h-full w-96 pl-4 lg:flex">
           <GameInformations player={myPlayer} gameState={gameState} />
         </div>
 
