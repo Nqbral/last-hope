@@ -41,11 +41,11 @@ export default function GameLobby({ lobbyState }: Props) {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 text-sm sm:text-base">
       <p className="italic">Nombre de joueurs minimum requis : 4</p>
       <p className="italic">Nombre de joueurs maximum : 8</p>
-      <div className="flex w-100 flex-col items-center justify-center gap-2 border-1 border-slate-700 py-4">
-        <h2 className="mb-2 text-lg">Liste des joueurs</h2>
+      <div className="flex w-80 flex-col items-center justify-center gap-2 border-1 border-slate-700 py-4 sm:w-100">
+        <h2 className="mb-2 text-base sm:text-lg">Liste des joueurs</h2>
         {lobbyState?.players.map((player, index) => {
           return (
             <div key={`player_${index}`}>
@@ -63,7 +63,7 @@ export default function GameLobby({ lobbyState }: Props) {
       </p>
       {isOwner ? (
         <div className="flex flex-col items-center gap-2">
-          <div className="flex flex-row items-center gap-3">
+          <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-3">
             <PrimaryButton
               buttonText="Lancer la partie"
               onClick={handleStart}
