@@ -97,7 +97,6 @@ export default function GameManager() {
     const lobbyIdJoin = searchParams.get('lobby');
 
     if (lobbyIdJoin) {
-      console.log(lobbyIdJoin);
       emitEvent(CLIENT_EVENTS.LOBBY_JOIN, { lobbyIdJoin });
       setHasJoined(true);
     }

@@ -36,7 +36,17 @@ export default function Home() {
 
   const createLobby = () => {
     if (!isLogged) {
-      console.log('Doit etre loggué');
+      toast(CustomNotification, {
+        data: {
+          title: 'Erreur',
+          content: 'Vous devez être connecté pour créer un lobby.',
+        },
+        hideProgressBar: true,
+        closeButton: false,
+        style: {
+          width: 300,
+        },
+      });
       return;
     }
 
