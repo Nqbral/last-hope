@@ -27,8 +27,6 @@ export class SocketManager {
     this.token = token;
     this.isInit = true;
 
-    console.log('connect socket');
-
     this.socket.on('connect', () => {
       this.isInit = true;
     });
