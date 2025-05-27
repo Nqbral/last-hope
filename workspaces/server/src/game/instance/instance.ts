@@ -1,4 +1,5 @@
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
+import { HttpService } from '@nestjs/axios';
 import { WsException } from '@nestjs/websockets';
 import { Card } from '@shared/classes/Card';
 import { HistoryEvent } from '@shared/classes/HistoryEvent';
@@ -15,8 +16,10 @@ import { GAME_FINISH_STATUSES } from '@shared/consts/GameFinishStatuses';
 import { GAME_STATES } from '@shared/consts/GameStates';
 import { LOBBY_STATES } from '@shared/consts/LobbyStates';
 import { NAME_CARD } from '@shared/consts/NameCard';
+import { NAME_ROLE } from '@shared/consts/NameRole';
 import { ServerEvents } from '@shared/enums/ServerEvents';
 import { ServerPayloads } from '@shared/types/ServerPayloads';
+import { lastValueFrom } from 'rxjs';
 
 import { Lobby } from '../lobby/lobby';
 
@@ -32,7 +35,10 @@ export class Instance {
   private statusFinish: string = '';
   private historyEvents: HistoryEvent[] = [];
 
-  constructor(private readonly lobby: Lobby) {}
+  constructor(
+    private readonly lobby: Lobby,
+    private readonly httpService: HttpService,
+  ) {}
 
   public triggerStart(client: AuthenticatedSocket) {
     if (client.userId !== this.lobby.owner.userId) {
@@ -69,9 +75,117 @@ export class Instance {
     this.dispatchGameState();
   }
 
-  private triggerFinish(statusFinish: string) {
+  private async updatePlayerStats(
+    userId: string,
+    token: string,
+    stats: { gamesPlayed?: number; wins?: number; losses?: number },
+  ) {
+    try {
+      const response = await lastValueFrom(
+        this.httpService.put(
+          `${process.env.NEXT_PUBLIC_WS_API_AUTH_URL}/user/stats/last-hope`,
+          stats,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        ),
+      );
+      return response.data;
+    } catch (err) {
+      console.error(
+        `Erreur lors de la mise à jour des stats du joueur ${userId}`,
+        err?.response?.data || err.message,
+      );
+    }
+  }
+
+  private async triggerFinish(statusFinish: string) {
     this.stateGame = GAME_STATES.GAME_FINISHED;
     this.statusFinish = statusFinish;
+
+    const doctors = this.lobby.players.filter(
+      (p) => p.role?.nameRole == NAME_ROLE.DOCTOR,
+    );
+    const infected = this.lobby.players.filter(
+      (p) => p.role?.nameRole == NAME_ROLE.INFECTED,
+    );
+
+    const doctorsClients = doctors.map((p) => {
+      return this.lobby.clients.find((c) => {
+        return p.userId == c.userId;
+      });
+    });
+
+    const infectedClients = infected.map((p) => {
+      return this.lobby.clients.find((c) => {
+        return p.userId == c.userId;
+      });
+    });
+
+    if (statusFinish == GAME_FINISH_STATUSES.DOCTORS_WIN) {
+      for (const doctorClient of doctorsClients) {
+        if (doctorClient?.userId) {
+          await this.updatePlayerStats(
+            doctorClient.userId,
+            doctorClient.token,
+            {
+              gamesPlayed: 1,
+              wins: 1,
+              losses: 0,
+            },
+          );
+        }
+      }
+
+      for (const infectedClient of infectedClients) {
+        if (infectedClient?.userId) {
+          await this.updatePlayerStats(
+            infectedClient.userId,
+            infectedClient.token,
+            {
+              gamesPlayed: 1,
+              wins: 0,
+              losses: 1,
+            },
+          );
+        }
+      }
+    }
+
+    if (
+      statusFinish == GAME_FINISH_STATUSES.INFECTED_WIN_BY_BOMB ||
+      statusFinish == GAME_FINISH_STATUSES.INFECTED_WIN_BY_TIME
+    ) {
+      for (const doctorClient of doctorsClients) {
+        if (doctorClient?.userId) {
+          await this.updatePlayerStats(
+            doctorClient.userId,
+            doctorClient.token,
+            {
+              gamesPlayed: 1,
+              wins: 0,
+              losses: 1,
+            },
+          );
+        }
+      }
+
+      for (const infectedClient of infectedClients) {
+        if (infectedClient?.userId) {
+          await this.updatePlayerStats(
+            infectedClient.userId,
+            infectedClient.token,
+            {
+              gamesPlayed: 1,
+              wins: 1,
+              losses: 0,
+            },
+          );
+        }
+      }
+    }
 
     this.dispatchGameState();
   }

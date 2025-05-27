@@ -18,7 +18,6 @@ export default function Navbar() {
       pathname +
       (searchParams ? `?${searchParams.toString()}` : '');
 
-    // Encode l'URL car elle va être passée en paramètre GET
     const redirectTo = encodeURIComponent(currentUrl);
 
     router.push(

@@ -1,11 +1,14 @@
 import { Lobby } from '@app/game/lobby/lobby';
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { WsException } from '@nestjs/websockets';
 import { LOBBY_STATES } from '@shared/consts/LobbyStates';
 import { ServerEvents } from '@shared/enums/ServerEvents';
 import { Server } from 'socket.io';
 
+@Injectable()
 export class LobbyManager {
   public server: Server;
 
@@ -15,6 +18,8 @@ export class LobbyManager {
   >();
 
   private readonly lastKnownLobbyPerUser: Map<string, string> = new Map();
+
+  constructor(private readonly httpService: HttpService) {}
 
   public createLobby(owner: AuthenticatedSocket, user: any): Lobby {
     const currentLobby = this.getLastLobbyForUser(owner.userId);
@@ -28,7 +33,7 @@ export class LobbyManager {
       throw new WsException('Already in a lobby');
     }
 
-    const lobby = new Lobby(this.server, owner);
+    const lobby = new Lobby(this.server, owner, this.httpService);
 
     this.server
       .to(owner.id)

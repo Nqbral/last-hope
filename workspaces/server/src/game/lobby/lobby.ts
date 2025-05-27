@@ -1,4 +1,5 @@
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
+import { HttpService } from '@nestjs/axios';
 import { Player } from '@shared/classes/Player';
 import { LOBBY_STATES } from '@shared/consts/LobbyStates';
 import { ServerEvents } from '@shared/enums/ServerEvents';
@@ -32,11 +33,12 @@ export class Lobby {
 
   public players: Player[] = [];
 
-  public readonly instance: Instance = new Instance(this);
+  public readonly instance: Instance = new Instance(this, this.httpService);
 
   constructor(
     private readonly server: Server,
     public readonly owner: AuthenticatedSocket,
+    private readonly httpService: HttpService,
   ) {}
 
   public addClient(newClient: AuthenticatedSocket): void {

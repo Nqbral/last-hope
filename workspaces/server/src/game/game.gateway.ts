@@ -37,12 +37,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(
     private readonly authService: AuthService,
-    private readonly lobbyManager: LobbyManager,
-    private readonly httpService: HttpService,
+    private lobbyManager: LobbyManager,
   ) {}
 
   afterInit(server: Server): any {
-    // Pass server instance to managers
     this.lobbyManager.server = server;
   }
 
@@ -56,8 +54,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     try {
       const payload = await this.authService.verifyToken(token);
-      client.user = payload; // Stocker l'utilisateur dans le client
-      client.userId = client.user.sub; // Met à jour le userId sur la connexion existante
+      client.user = payload;
+      client.userId = client.user.sub;
       client.userName = await this.authService.getUsername(token);
       client.token = token;
       const lastLobbyId = this.lobbyManager.getLastLobbyForUser(client.userId);
