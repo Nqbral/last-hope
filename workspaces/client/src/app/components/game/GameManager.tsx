@@ -71,6 +71,7 @@ export default function GameManager() {
       data,
     ) => {
       setLobbyError(data);
+      setHasJoined(false);
       setLoading(false);
     };
 
@@ -91,9 +92,12 @@ export default function GameManager() {
       return;
     }
 
+    setLobbyError({ error: '', message: '' });
+
     const lobbyIdJoin = searchParams.get('lobby');
 
     if (lobbyIdJoin) {
+      console.log(lobbyIdJoin);
       emitEvent(CLIENT_EVENTS.LOBBY_JOIN, { lobbyIdJoin });
       setHasJoined(true);
     }
