@@ -31,12 +31,12 @@ export default function ModalCheckingCards({ player, gameState }: Props) {
 
   return (
     <ModalTemplate>
-      <div className="flex flex-col items-center gap-6 text-center">
-        <h2 className="text-secondary-hover pb-2 text-2xl">
+      <div className="flex flex-col items-center gap-2 text-center sm:gap-3 md:gap-6">
+        <h2 className="text-secondary-hover pb-2 text-lg sm:text-2xl">
           Vérification des cartes
         </h2>
         {player != undefined && (
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-4 text-xs sm:text-sm md:text-base">
             <div>Votre main</div>
             <div className="flex flex-row items-center justify-center gap-2">
               {player.hand.map((card, index) => {
@@ -51,8 +51,8 @@ export default function ModalCheckingCards({ player, gameState }: Props) {
             </div>
           </div>
         )}
-        <div>En attente de :</div>
-        <div>
+        <div className="text-xs sm:text-sm md:text-base">En attente de :</div>
+        <div className="text-xs sm:text-sm md:text-base">
           {playersNotReady.map((playersNotReady, index) => {
             if (index == 0) {
               return (

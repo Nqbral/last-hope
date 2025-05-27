@@ -23,7 +23,7 @@ export default function PlayersDisplay({ gameState, myPlayer }: Props) {
   }, [gameState, myPlayer]);
 
   return (
-    <div className="flex w-full flex-row justify-center gap-6">
+    <div className="flex w-full flex-row flex-wrap justify-center gap-1 sm:gap-2 md:gap-4 lg:gap-6">
       {gameState?.players.map((player, index) => {
         return (
           <PlayerDisplay

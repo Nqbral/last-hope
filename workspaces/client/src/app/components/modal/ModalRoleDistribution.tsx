@@ -31,13 +31,13 @@ export default function ModalRoleDistribution({ player, gameState }: Props) {
 
   return (
     <ModalTemplate>
-      <div className="flex flex-col items-center gap-6 text-center">
-        <h2 className="text-secondary-hover pb-2 text-2xl">
+      <div className="flex flex-col items-center gap-2 text-center sm:gap-3 md:gap-6">
+        <h2 className="text-secondary-hover pb-2 text-lg sm:text-2xl">
           Distribution des rôles
         </h2>
         {player != undefined && (
           <>
-            <div>
+            <div className="text-xs sm:text-sm md:text-base">
               Vous êtes un{' '}
               <span className={`text-${player.role?.color}`}>
                 {player.role?.nameRole}
@@ -45,11 +45,13 @@ export default function ModalRoleDistribution({ player, gameState }: Props) {
               .
             </div>
             <RoleImage role={player.role} />
-            <div>{player.role?.goal}</div>
+            <div className="text-xs sm:text-sm md:text-base">
+              {player.role?.goal}
+            </div>
           </>
         )}
-        <div>En attente de :</div>
-        <div>
+        <div className="text-xs sm:text-sm md:text-base">En attente de :</div>
+        <div className="text-xs sm:text-sm md:text-base">
           {playersNotReady.map((playersNotReady, index) => {
             if (index == 0) {
               return (

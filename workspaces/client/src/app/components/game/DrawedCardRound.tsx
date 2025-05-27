@@ -18,9 +18,11 @@ export default function DrawedCardsRound({ gameState }: Props) {
   }, [gameState]);
 
   return (
-    <div className="border-sm flex h-[250px] min-w-3xl flex-col items-center gap-4 border-1 border-neutral-800 py-4">
-      <div className="text-xl">Carte(s) neutralisée(s) dans la manche</div>
-      <div className="flex flex-row items-center gap-3">
+    <div className="border-sm flex min-h-[150px] min-w-80 flex-col items-center gap-4 border-1 border-neutral-800 py-4 sm:min-h-[190px] sm:min-w-96 md:min-h-[220px] md:min-w-2xl lg:min-h-[250px] lg:min-w-3xl">
+      <div className="text-sm sm:text-base md:text-lg lg:text-xl">
+        Carte(s) neutralisée(s) dans la manche
+      </div>
+      <div className="flex flex-row items-center gap-1 md:gap-2 lg:gap-3">
         {drawedCardRounds.map((card, index) => {
           return (
             <CardImage

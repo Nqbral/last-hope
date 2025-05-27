@@ -30,11 +30,11 @@ export default function ModalOtherPlayerCardDraw({ gameState }: Props) {
   }, [gameState]);
   return (
     <ModalTemplate>
-      <div className="flex flex-col items-center gap-6 text-center">
-        <h2 className="text-secondary-hover pb-2 text-2xl">
+      <div className="flex flex-col items-center gap-2 text-center sm:gap-3 md:gap-6">
+        <h2 className="text-secondary-hover pb-2 text-lg sm:text-2xl">
           Neutralisation effectuée
         </h2>
-        <div>
+        <div className="text-xs sm:text-sm md:text-base">
           <span className={`text-${gameState?.playerTurn?.color}`}>
             {gameState?.playerTurn?.userName}
           </span>{' '}
@@ -68,12 +68,12 @@ export default function ModalOtherPlayerCardDraw({ gameState }: Props) {
                 src={BackCard}
                 alt={`backcard-player-checked-${index}`}
                 key={`backcard-player-checked-${index}`}
-                className="w-24"
+                className="w-12 sm:w-16 md:w-20 lg:w-24"
               />
             );
           })}
         </div>
-        <div>
+        <div className="text-sm sm:text-base">
           Cette fenêtre va se fermer automatiquement d&apos;ici quelques
           secondes.
         </div>

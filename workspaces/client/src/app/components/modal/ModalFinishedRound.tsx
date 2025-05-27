@@ -53,32 +53,34 @@ export default function ModalFinishedRound({ lobbyState, gameState }: Props) {
 
   return (
     <ModalTemplate>
-      <div className="flex w-xl flex-col items-center gap-6 text-center">
-        <h2 className="text-secondary-hover pb-2 text-2xl">Partie terminée</h2>
+      <div className="flex flex-col items-center gap-2 text-center sm:gap-3 md:gap-6">
+        <h2 className="text-secondary-hover pb-2 text-lg sm:text-2xl">
+          Partie terminée
+        </h2>
         {gameState?.statusFinish == GAME_FINISH_STATUSES.DOCTORS_WIN && (
-          <div>
+          <div className="text-xs sm:text-sm md:text-base">
             Les <span className="text-emerald-400">Docteurs</span> ont gagné en
             développant le remède.
           </div>
         )}
         {gameState?.statusFinish ==
           GAME_FINISH_STATUSES.INFECTED_WIN_BY_BOMB && (
-          <div>
+          <div className="text-xs sm:text-sm md:text-base">
             Les <span className="text-red-400">Infectés</span> ont gagné en
             faisant exploser le laboratoire rapidement.
           </div>
         )}
         {gameState?.statusFinish ==
           GAME_FINISH_STATUSES.INFECTED_WIN_BY_TIME && (
-          <div>
+          <div className="text-xs sm:text-sm md:text-base">
             Les <span className="text-red-400">Infectés</span> ont gagné car les{' '}
             <span className="text-emerald-400">Docteurs</span> n&apos;ont pas
             réussi à développer le remède à temps.
           </div>
         )}
 
-        <h3 className="text-xl text-emerald-400">Docteurs</h3>
-        <div className="flex flex-row items-center gap-2">
+        <h3 className="text-lg text-emerald-400 md:text-xl">Docteurs</h3>
+        <div className="flex flex-row items-center gap-2 text-xs sm:text-sm md:text-base">
           {listDoctors.map((player, index) => {
             return (
               <div
@@ -92,8 +94,8 @@ export default function ModalFinishedRound({ lobbyState, gameState }: Props) {
           })}
         </div>
 
-        <h3 className="text-xl text-red-400">Infectés</h3>
-        <div className="flex flex-row items-center gap-2">
+        <h3 className="text-lg text-red-400 md:text-xl">Infectés</h3>
+        <div className="flex flex-row items-center gap-2 text-xs sm:text-sm md:text-base">
           {listInfected.map((player, index) => {
             return (
               <div
@@ -107,7 +109,7 @@ export default function ModalFinishedRound({ lobbyState, gameState }: Props) {
           })}
         </div>
 
-        <div className="flex flex-row items-center justify-center gap-3">
+        <div className="flex flex-col items-center justify-center gap-1 md:flex-row md:gap-3">
           {isOwner ? (
             <>
               <PrimaryButton

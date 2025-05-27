@@ -10,12 +10,22 @@ type Props = {
 
 export default function RoleImage({ role }: Props) {
   if (role?.nameRole == NAME_ROLE.DOCTOR) {
-    return <Image src={DoctorImg} alt="doctor_img" className="w-32 min-w-24" />;
+    return (
+      <Image
+        src={DoctorImg}
+        alt="doctor_img"
+        className="w-20 sm:w-24 md:w-32"
+      />
+    );
   }
 
   if (role?.nameRole == NAME_ROLE.INFECTED) {
     return (
-      <Image src={InfectedImg} alt="infected_img" className="w-32 min-w-24" />
+      <Image
+        src={InfectedImg}
+        alt="infected_img"
+        className="w-20 sm:w-24 md:w-32"
+      />
     );
   }
 

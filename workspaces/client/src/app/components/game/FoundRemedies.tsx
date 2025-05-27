@@ -7,7 +7,7 @@ type Props = {
 
 export default function FoundRemedies({ gameState }: Props) {
   return (
-    <div className="text-xl">
+    <div className="pb-8 text-base md:text-lg lg:text-xl">
       Remède(s) trouvé(s) :{' '}
       <span className="text-emerald-400">{gameState?.remediesFound}</span>
     </div>

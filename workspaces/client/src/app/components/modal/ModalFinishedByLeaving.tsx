@@ -25,9 +25,11 @@ export default function ModalFinishedByLeaving({ lobbyState }: Props) {
 
   return (
     <ModalTemplate>
-      <div className="flex w-xl flex-col items-center gap-6 text-center">
-        <h2 className="text-secondary-hover pb-2 text-2xl">Partie terminée</h2>
-        <div>
+      <div className="flex flex-col items-center gap-2 text-center sm:gap-3 md:gap-6">
+        <h2 className="text-secondary-hover pb-2 text-lg sm:text-2xl">
+          Partie terminée
+        </h2>
+        <div className="text-xs sm:text-sm md:text-base">
           Un joueur a quitté la partie, la partie se termine prématurément.
         </div>
         <div className="flex flex-row items-center justify-center gap-3">

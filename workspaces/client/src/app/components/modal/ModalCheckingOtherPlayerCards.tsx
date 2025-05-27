@@ -53,10 +53,12 @@ export default function ModalCheckingOtherPlayerCards({
 
   return (
     <ModalTemplate>
-      <div className="flex flex-col items-center gap-6 text-center">
-        <h2 className="text-secondary-hover pb-2 text-2xl">Neutralisation</h2>
+      <div className="flex flex-col items-center gap-2 text-center sm:gap-3 md:gap-6">
+        <h2 className="text-secondary-hover pb-2 text-lg sm:text-2xl">
+          Neutralisation
+        </h2>
         {isPlayerTurn ? (
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 text-xs sm:text-sm md:text-base">
             <div>
               Vous regardez la main de{' '}
               <span className={`text-${gameState?.checkedPlayerHand?.color}`}>
@@ -69,7 +71,7 @@ export default function ModalCheckingOtherPlayerCards({
             </div>
           </div>
         ) : (
-          <div>
+          <div className="text-xs sm:text-sm md:text-base">
             <span className={`text-${gameState?.playerTurn?.color}`}>
               {gameState?.playerTurn?.userName}
             </span>{' '}
@@ -86,7 +88,7 @@ export default function ModalCheckingOtherPlayerCards({
             )}
           </div>
         )}
-        <div className="flex flex-row items-center gap-2">
+        <div className="flex flex-row flex-wrap items-center gap-2">
           {isPlayerTurn
             ? gameState?.checkedPlayerHand?.hand.map((card, index) => {
                 return (
@@ -94,7 +96,7 @@ export default function ModalCheckingOtherPlayerCards({
                     src={BackCard}
                     alt={`backcard-player-checked-${index}`}
                     key={`backcard-player-checked-${index}`}
-                    className="w-24 transition-transform hover:scale-105"
+                    className="w-12 transition-transform hover:scale-105 sm:w-16 md:w-20 lg:w-24"
                     onClick={() => {
                       selectCardToDraw(index);
                     }}
@@ -107,7 +109,7 @@ export default function ModalCheckingOtherPlayerCards({
                     src={BackCard}
                     alt={`backcard-player-checked-${index}`}
                     key={`backcard-player-checked-${index}`}
-                    className="w-24"
+                    className="w-12 sm:w-16 md:w-20 lg:w-24"
                   />
                 );
               })}

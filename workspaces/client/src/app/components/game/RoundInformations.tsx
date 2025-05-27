@@ -21,7 +21,9 @@ export default function RoundInformations({ gameState, player }: Props) {
   }, [gameState, player]);
   return (
     <div className="flex flex-col items-center gap-2 text-center">
-      <div className="text-2xl">Manche {gameState?.roundNumber}</div>
+      <div className="text-lg sm:text-xl md:text-2xl">
+        Manche {gameState?.roundNumber}
+      </div>
       {isPlayerTurn ? (
         <div>À votre tour de jouer</div>
       ) : (
