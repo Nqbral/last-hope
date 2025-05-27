@@ -62,6 +62,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       if (lastLobbyId) {
         client.lobby = this.lobbyManager.getLobby(client, lastLobbyId);
+        client.lobby.addClient(client);
       }
 
       if (!this.playerConnections.has(client.userId)) {
