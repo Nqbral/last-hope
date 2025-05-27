@@ -7,7 +7,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Rendre les variables d'env accessibles partout
+      isGlobal: true,
     }),
     GameModule,
     ScheduleModule.forRoot(),

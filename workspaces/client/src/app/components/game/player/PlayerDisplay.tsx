@@ -3,7 +3,6 @@ import { useSocket } from '@contexts/SocketContext';
 import { Player } from '@last-hope/shared/classes/Player';
 import { CLIENT_EVENTS } from '@last-hope/shared/consts/ClientEvents';
 import BackCard from '@public/backcard.png';
-// ← évite "@public"
 import Image from 'next/image';
 import { toast } from 'react-toastify';
 

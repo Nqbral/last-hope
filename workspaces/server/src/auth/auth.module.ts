@@ -7,15 +7,15 @@ import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   providers: [AuthService, JwtWsGuard],
-  exports: [AuthService, JwtWsGuard], // <-- Important
+  exports: [AuthService, JwtWsGuard],
   imports: [
     HttpModule,
     JwtModule.registerAsync({
-      imports: [ConfigModule], // Si tu utilises ConfigModule pour charger .env
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'), // Récupérer la clé depuis l'env
-        signOptions: { expiresIn: '1h' }, // Le temps d'expiration du JWT
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '1h' },
       }),
     }),
   ],
