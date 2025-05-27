@@ -18,7 +18,7 @@ export default function PlayerDisplay({
   isPlayerTurn,
 }: Props) {
   const { emitEvent } = useSocket();
-  const offset = 2; // en rem, ou utilise style en px
+  const offset = 2;
 
   const checkOtherPlayerCard = (playerId: string) => {
     if (!isPlayerTurn) {
