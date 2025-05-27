@@ -28,7 +28,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="fixed top-0 z-50 flex w-full flex-row items-center justify-between bg-neutral-900 px-6 py-4 shadow-sm shadow-neutral-950">
+    <div className="fixed top-0 z-40 flex w-full flex-row items-center justify-between bg-neutral-900 px-6 py-4 shadow-sm shadow-neutral-950">
       <Link href="/">
         <div className="flex flex-row items-center gap-2">
           <Image src={LastHopeLogo} className="w-32" alt="nqbral-games-logo" />

@@ -13,6 +13,7 @@ import { LOBBY_STATES } from '@last-hope/shared/consts/LobbyStates';
 import { ServerEvents } from '@last-hope/shared/enums/ServerEvents';
 import { ServerPayloads } from '@last-hope/shared/types/ServerPayloads';
 import { Modal } from '@mui/material';
+import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Slide, ToastContainer } from 'react-toastify';
 
@@ -30,6 +31,7 @@ type Props = {
 export default function Game({ lobbyState, gameState }: Props) {
   const { userId } = useSocket();
   const [myPlayer, setPlayer] = useState<Player | undefined>(undefined);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (gameState != null) {
@@ -40,6 +42,22 @@ export default function Game({ lobbyState, gameState }: Props) {
       );
     }
   }, [gameState, userId]);
+
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth >= 1024) {
+        setSidebarOpen(false);
+      }
+    }
+
+    window.addEventListener('resize', handleResize);
+
+    handleResize();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   return (
     <>
@@ -148,7 +166,36 @@ export default function Game({ lobbyState, gameState }: Props) {
 
       {/* GAME */}
       <div className="flex min-h-screen w-full flex-row pt-20">
-        <GameInformations player={myPlayer} gameState={gameState} />
+        <button
+          className="absolute top-20 left-4 z-50 lg:hidden"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <Menu size={28} />
+        </button>
+
+        <div className="hidden h-full min-w-96 pl-4 lg:flex">
+          <GameInformations player={myPlayer} gameState={gameState} />
+        </div>
+
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/50"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        <div
+          className={`fixed top-0 left-0 z-50 h-full w-80 transform bg-neutral-950 p-4 shadow-lg transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:hidden`}
+        >
+          <button
+            className="mb-4 ml-auto"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <X size={24} />
+          </button>
+          <GameInformations player={myPlayer} gameState={gameState} />
+        </div>
+
         <div className="flex w-full flex-col items-center gap-8">
           <RoundInformations gameState={gameState} player={myPlayer} />
           <PlayersDisplay gameState={gameState} myPlayer={myPlayer} />

@@ -12,7 +12,7 @@ type Props = {
 
 export default function GameInformations({ player, gameState }: Props) {
   return (
-    <div className="hidden min-w-96 flex-col items-center gap-8 lg:flex">
+    <div className="flex h-full w-full flex-col items-center gap-4">
       <HistoryChat gameState={gameState} />
       <RolePlayer player={player} />
     </div>
