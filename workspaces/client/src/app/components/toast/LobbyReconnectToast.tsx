@@ -26,7 +26,7 @@ export default function LobbyReconnectToast() {
   }
 
   return (
-    <div className="fixed right-4 bottom-4 z-50 flex w-80 flex-col items-center rounded border p-4 shadow-lg">
+    <div className="md:text-md fixed right-4 bottom-4 z-50 flex w-72 flex-col items-center rounded border bg-neutral-900 p-4 text-sm shadow-lg sm:w-80">
       <p className="mb-2 text-sm">Vous avez une partie en cours.</p>
       <LinkButton
         buttonText="Revenir"

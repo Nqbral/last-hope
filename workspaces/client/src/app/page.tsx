@@ -13,8 +13,12 @@ export default function Home() {
       <Navbar />
       <LobbyReconnectToast />
       <div className="flex h-full min-h-screen w-full flex-col items-center justify-center gap-6">
-        <Image src={LastHopeLogo} alt="last-hope-logo" className="w-64" />
-        <div className="flex flex-row gap-12">
+        <Image
+          src={LastHopeLogo}
+          alt="last-hope-logo"
+          className="w-32 sm:w-48 md:w-64"
+        />
+        <div className="flex flex-col gap-1 md:flex-row md:gap-12">
           <LinkButton
             buttonText={'Jouer'}
             linkTo={'lobby'}

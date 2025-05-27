@@ -100,8 +100,8 @@ export default function Home() {
       >
         <ModalJoinLobby handleClose={handleCloseLobbyJoin} />
       </Modal>
-      <div className="flex h-full min-h-screen w-full flex-col items-center justify-center gap-4">
-        <div className="flex flex-row gap-12">
+      <div className="flex h-full min-h-screen w-full flex-col items-center justify-center gap-2 sm:gap-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:gap-12">
           <PrimaryButton buttonText="Créer un lobby" onClick={createLobby} />
           <SecondaryButton
             buttonText="Rejoindre un lobby"

@@ -10,10 +10,10 @@ export default function ModalJoinLobby({ handleClose }: Props) {
   return (
     <ModalTemplate>
       <div className="flex flex-col items-center gap-6 text-center">
-        <h2 className="text-secondary-hover pb-2 text-2xl">
+        <h2 className="text-secondary-hover pb-2 text-lg sm:text-2xl">
           Rejoindre un lobby
         </h2>
-        <p>
+        <p className="text-sm sm:text-base">
           Pour rejoindre un lobby, il suffit de copier/coller le lien donner par
           le créateur du lobby dans le navigateur
         </p>
