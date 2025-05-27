@@ -1,5 +1,6 @@
 import { Lobby } from '@app/game/lobby/lobby';
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
+import { Cron } from '@nestjs/schedule';
 import { WsException } from '@nestjs/websockets';
 import { LOBBY_STATES } from '@shared/consts/LobbyStates';
 import { ServerEvents } from '@shared/enums/ServerEvents';
@@ -111,5 +112,30 @@ export class LobbyManager {
       this.clearLastLobbyForUser(client.userId);
       client.emit(ServerEvents.LobbyLeave);
     });
+  }
+
+  // Periodically clean up lobbies (every minutes)
+  @Cron('5 * * * * *')
+  private lobbiesCleaner(): void {
+    for (const [lobbyId, lobby] of this.lobbies) {
+      const now = new Date().getTime();
+      const lobbyUpdatedAt = lobby.updatedAt.getTime();
+      const lobbyLifetime = now - lobbyUpdatedAt;
+
+      if (lobby.stateLobby === LOBBY_STATES.GAME_DELETED) {
+        this.lobbies.delete(lobbyId);
+        return;
+      }
+
+      if (lobbyLifetime > 1000 * 60 * 60) {
+        lobby.deleteLobby();
+        lobby.clients.forEach((client) => {
+          client.leave(lobbyId);
+          client.lobby = null;
+          this.clearLastLobbyForUser(client.userId);
+          client.emit(ServerEvents.LobbyLeave);
+        });
+      }
+    }
   }
 }

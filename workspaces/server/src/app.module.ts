@@ -2,6 +2,7 @@ import { AppController } from '@app/app.controller';
 import { GameModule } from '@app/game/game.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -9,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true, // Rendre les variables d'env accessibles partout
     }),
     GameModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [],
