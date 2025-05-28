@@ -36,3 +36,5 @@ lerna-debug.log*
 
 # sensible files
 .env.local
+
+.env*
