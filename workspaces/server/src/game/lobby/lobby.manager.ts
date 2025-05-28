@@ -8,6 +8,8 @@ import { LOBBY_STATES } from '@shared/consts/LobbyStates';
 import { ServerEvents } from '@shared/enums/ServerEvents';
 import { Server } from 'socket.io';
 
+import { GameGateway } from '../game.gateway';
+
 @Injectable()
 export class LobbyManager {
   public server: Server;
@@ -17,9 +19,15 @@ export class LobbyManager {
     Lobby
   >();
 
+  private gameGateway: GameGateway;
+
   private readonly lastKnownLobbyPerUser: Map<string, string> = new Map();
 
   constructor(private readonly httpService: HttpService) {}
+
+  setGameGateway(gateway: GameGateway) {
+    this.gameGateway = gateway;
+  }
 
   public createLobby(owner: AuthenticatedSocket, user: any): Lobby {
     const currentLobby = this.getLastLobbyForUser(owner.userId);
@@ -51,7 +59,7 @@ export class LobbyManager {
   public getLobby(client: AuthenticatedSocket, lobbyId: string): Lobby {
     const lobby = this.lobbies.get(lobbyId);
 
-    if (!lobby || lobby.stateLobby == LOBBY_STATES.GAME_DELETED) {
+    if (!lobby) {
       this.server.to(client.id).emit(ServerEvents.LobbyError, {
         error: 'Lobby not found',
         message: 'Aucune partie a été trouvée pour cette URL.',
@@ -83,26 +91,19 @@ export class LobbyManager {
         message: 'Vous êtes déjà dans une autre partie.',
       });
 
+      const lobby = this.getLobby(client, currentLobby);
+      lobby.addClient(client);
+      lobby.instance.dispatchGameState();
+
       throw new WsException('Already in a lobby');
     }
 
     const lobby = this.getLobby(client, lobbyId);
 
-    if (lobby.clients.length >= 8) {
-      this.server.to(client.id).emit(ServerEvents.LobbyError, {
-        error: 'Lobby full',
-        message: 'La partie est déjà pleine.',
-      });
-      throw new WsException('Trop de joueurs');
-    }
-
+    lobby.addClient(client);
     this.lastKnownLobbyPerUser.set(client.userId, lobby.id);
 
-    lobby.addClient(client);
-
-    if (lobby.stateLobby != LOBBY_STATES.IN_LOBBY) {
-      lobby.instance.dispatchGameState();
-    }
+    lobby.instance.dispatchGameState();
   }
 
   public deleteLobby(client: AuthenticatedSocket, lobbyId: string): void {
@@ -112,10 +113,15 @@ export class LobbyManager {
     lobby.deleteLobby();
 
     lobby.clients.forEach((client) => {
-      client.leave(lobbyId);
-      client.lobby = null;
+      const connections =
+        this.gameGateway.playerConnections.get(client.userId) || [];
+
+      connections.forEach((socket) => {
+        socket.leave(lobbyId);
+        socket.lobby = null;
+        socket.emit(ServerEvents.LobbyLeave, { message: 'Lobby supprimé.' });
+      });
       this.clearLastLobbyForUser(client.userId);
-      client.emit(ServerEvents.LobbyLeave);
     });
   }
 
@@ -134,11 +140,19 @@ export class LobbyManager {
 
       if (lobbyLifetime > 1000 * 60 * 60) {
         lobby.deleteLobby();
+
         lobby.clients.forEach((client) => {
-          client.leave(lobbyId);
-          client.lobby = null;
+          const connections =
+            this.gameGateway.playerConnections.get(client.userId) || [];
+
+          connections.forEach((socket) => {
+            socket.leave(lobbyId);
+            socket.lobby = null;
+            socket.emit(ServerEvents.LobbyLeave, {
+              message: 'Lobby supprimé.',
+            });
+          });
           this.clearLastLobbyForUser(client.userId);
-          client.emit(ServerEvents.LobbyLeave);
         });
       }
     }

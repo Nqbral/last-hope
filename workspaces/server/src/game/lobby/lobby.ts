@@ -1,5 +1,6 @@
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
 import { HttpService } from '@nestjs/axios';
+import { WsException } from '@nestjs/websockets';
 import { Player } from '@shared/classes/Player';
 import { LOBBY_STATES } from '@shared/consts/LobbyStates';
 import { ServerEvents } from '@shared/enums/ServerEvents';
@@ -58,6 +59,18 @@ export class Lobby {
       return;
     }
 
+    if (
+      this.stateLobby == LOBBY_STATES.GAME_DELETED ||
+      this.stateLobby == LOBBY_STATES.GAME_FINISHED_BY_LEAVING
+    ) {
+      this.server.to(newClient.id).emit(ServerEvents.LobbyError, {
+        error: 'Lobby finished',
+        message:
+          "La partie n'est pas joignable car elle est terminée ou supprimée.",
+      });
+      return;
+    }
+
     if (this.stateLobby != LOBBY_STATES.IN_LOBBY) {
       this.server.to(newClient.id).emit(ServerEvents.LobbyError, {
         error: 'Lobby in progress',
@@ -65,6 +78,14 @@ export class Lobby {
           'La partie est déjà en cours. Vous ne pouvez pas la rejoindre.',
       });
       return;
+    }
+
+    if (this.clients.length >= 8) {
+      this.server.to(newClient.id).emit(ServerEvents.LobbyError, {
+        error: 'Lobby full',
+        message: 'La partie est déjà pleine.',
+      });
+      throw new WsException('Trop de joueurs');
     }
 
     this.clients.push(newClient);

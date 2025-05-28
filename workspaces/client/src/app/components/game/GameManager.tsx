@@ -20,8 +20,8 @@ export default function GameManager() {
   const searchParams = useSearchParams();
   const { isConnectedSocket, addListener, removeListener, emitEvent } =
     useSocket();
-  const [hasJoined, setHasJoined] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [hasJoined, setHasJoined] = useState(false);
   const [lobbyError, setLobbyError] = useState<
     ServerPayloads[ServerEvents.LobbyError]
   >({ error: '', message: '' });
@@ -58,6 +58,7 @@ export default function GameManager() {
       data,
     ) => {
       setLobbyState(data);
+      setHasJoined(true);
       setLoading(false);
     };
 
@@ -65,13 +66,13 @@ export default function GameManager() {
       data,
     ) => {
       setGameState(data);
+      console.log('game state data');
     };
 
     const onLobbyError: Listener<ServerPayloads[ServerEvents.LobbyError]> = (
       data,
     ) => {
       setLobbyError(data);
-      setHasJoined(false);
       setLoading(false);
     };
 
@@ -87,18 +88,17 @@ export default function GameManager() {
   }, [isConnectedSocket, addListener, removeListener]);
 
   useEffect(() => {
+    setLobbyError({ error: '', message: '' });
+
     if (!isConnectedSocket || hasJoined) {
       setLoading(false);
       return;
     }
 
-    setLobbyError({ error: '', message: '' });
-
     const lobbyIdJoin = searchParams.get('lobby');
 
     if (lobbyIdJoin) {
       emitEvent(CLIENT_EVENTS.LOBBY_JOIN, { lobbyIdJoin });
-      setHasJoined(true);
     }
   }, [emitEvent, searchParams, isConnectedSocket, hasJoined]);
 

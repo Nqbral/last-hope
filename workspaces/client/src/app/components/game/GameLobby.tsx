@@ -56,7 +56,7 @@ export default function GameLobby({ lobbyState }: Props) {
         })}
       </div>
       <p
-        className={errMsgName ? 'text-red-600' : 'hidden'}
+        className={errMsgName ? 'text-center text-red-600' : 'hidden'}
         aria-live="assertive"
       >
         {errMsgName}

@@ -5,7 +5,7 @@ import { AttachUserInterceptor } from '@app/auth/interceptors/attach-user.interc
 import { LobbyManager } from '@app/game/lobby/lobby.manager';
 import { AuthenticatedSocket } from '@app/types/AuthenticatedSocket';
 import { HttpService } from '@nestjs/axios';
-import { UseGuards, UseInterceptors } from '@nestjs/common';
+import { Injectable, UseGuards, UseInterceptors } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -33,7 +33,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  private playerConnections = new Map<string, Set<string>>();
+  public playerConnections: Map<string, AuthenticatedSocket[]> = new Map();
 
   constructor(
     private readonly authService: AuthService,
@@ -42,6 +42,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   afterInit(server: Server): any {
     this.lobbyManager.server = server;
+    this.lobbyManager.setGameGateway(this);
   }
 
   async handleConnection(client: any) {
@@ -65,11 +66,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.lobby.addClient(client);
       }
 
-      if (!this.playerConnections.has(client.userId)) {
-        this.playerConnections.set(client.userId, new Set());
-      }
-
-      this.playerConnections.get(client.userId)!.add(client.id);
+      const existingSockets = this.playerConnections.get(client.userId) || [];
+      this.playerConnections.set(client.userId, [...existingSockets, client]);
 
       client.emit(ServerEvents.Authenticated, {
         userId: client.userId,
@@ -81,17 +79,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(client: AuthenticatedSocket) {
-    const connections = this.playerConnections.get(client.userId);
-    if (!connections) return;
+    const existingSockets = this.playerConnections.get(client.userId) || [];
 
-    connections.delete(client.id);
+    if (existingSockets.length == 0) return;
+
+    const updatedSockets = existingSockets.filter(
+      (socket) => socket.id !== client.id,
+    );
+
+    if (updatedSockets.length === 0) {
+      this.playerConnections.delete(client.userId);
+    } else {
+      this.playerConnections.set(client.userId, updatedSockets);
+    }
 
     if (!client.lobby) return;
 
     const lobby = client.lobby;
     const player = lobby.getPlayerById?.(client.userId);
 
-    if (connections.size === 0 && player) {
+    if (updatedSockets.length === 0 && player) {
       if (lobby.stateLobby == LOBBY_STATES.IN_LOBBY) {
         if (lobby.owner.userId == client.userId) {
           this.lobbyManager.deleteLobby(client, lobby.id);
@@ -108,6 +115,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
 
       lobby.dispatchLobbyState();
+      return;
     }
   }
 
