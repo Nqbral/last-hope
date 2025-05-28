@@ -1,0 +1,18 @@
+services:
+  client:
+    build:
+      context: .
+      dockerfile: ./docker/client/Dockerfile
+    ports:
+      - "3872:3000"
+    restart: unless-stopped
+
+  server:
+    build:
+      context: .
+      dockerfile: ./docker/server/Dockerfile
+    ports:
+      - "3873:3000"
+    volumes:
+      - "./workspaces/server/var:/home/workspaces/server/var"
+    restart: unless-stopped
