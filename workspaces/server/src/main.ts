@@ -8,7 +8,11 @@ async function bootstrap() {
 
   app.useWebSocketAdapter(new GameIoAdapter(app));
 
-  await app.listen(3000, '0.0.0.0');
+  if (process.env.IS_PROD === 'true') {
+    await app.listen(3000, '0.0.0.0');
+  } else {
+    await app.listen(3001);
+  }
 }
 
 bootstrap();
