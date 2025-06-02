@@ -8,7 +8,7 @@ async function bootstrap() {
 
   app.useWebSocketAdapter(new GameIoAdapter(app));
 
-  await app.listen(3001);
+  await app.listen(3000);
 }
 
 bootstrap();
