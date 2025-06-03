@@ -50,6 +50,7 @@ export class LobbyManager {
     this.lobbies.set(lobby.id, lobby);
 
     lobby.addClient(owner);
+    this.addLobby(owner, lobby);
     this.emitEventForAllConnexionsClient(owner, ServerEvents.LobbyJoin, {
       lobbyId: lobby.id,
     });
@@ -100,6 +101,7 @@ export class LobbyManager {
     const lobby = this.getLobby(client, lobbyId);
 
     lobby.addClient(client);
+    this.addLobby(client, lobby);
     this.emitEventForAllConnexionsClient(client, ServerEvents.LobbyJoin, {
       lobbyId: lobby.id,
     });
@@ -127,7 +129,16 @@ export class LobbyManager {
     });
   }
 
-  private emitEventForAllConnexionsClient(
+  private addLobby(client: AuthenticatedSocket, lobby: Lobby): void {
+    const connections =
+      this.gameGateway.playerConnections.get(client.userId) || [];
+
+    connections.forEach((socket) => {
+      socket.lobby = lobby;
+    });
+  }
+
+  public emitEventForAllConnexionsClient(
     client: AuthenticatedSocket,
     event: ServerEvents,
     data: any,
