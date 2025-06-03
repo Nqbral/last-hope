@@ -45,10 +45,6 @@ export class Lobby {
   public addClient(newClient: AuthenticatedSocket): void {
     const existing = this.players.find((p) => p.userId === newClient.userId);
 
-    this.server
-      .to(newClient.id)
-      .emit(ServerEvents.LobbyJoin, { lobbyId: this.id });
-
     if (existing) {
       existing.disconnected = false;
       newClient.join(this.id);
