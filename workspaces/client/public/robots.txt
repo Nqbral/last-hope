@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://last-hope.nqbral-games.fr
+
+# Sitemaps
+Sitemap: https://last-hope.nqbral-games.fr/sitemap.xml

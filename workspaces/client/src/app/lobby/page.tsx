@@ -4,6 +4,7 @@ import LinkButton, { TypeLinkButton } from '@components/buttons/LinkButton';
 import PrimaryButton from '@components/buttons/PrimaryButton';
 import SecondaryButton from '@components/buttons/SecondaryButton';
 import Footer from '@components/footer/Footer';
+import HeadDescription from '@components/head/HeadDescription';
 import ModalJoinLobby from '@components/modal/ModalJoinLobby';
 import Navbar from '@components/navbar/Navbar';
 import CustomNotification from '@components/notifications/CustomNotification';
@@ -88,38 +89,41 @@ export default function Home() {
   }, [isConnectedSocket, addListener, removeListener, router]);
 
   return (
-    <LoadingAuth>
-      <Navbar />
-      <LobbyReconnectToast />
-      <ToastContainer transition={Slide} />
-      <Modal
-        open={openLobbyJoin}
-        onClose={handleCloseLobbyJoin}
-        aria-labelledby="modal-lobby-join"
-        aria-describedby="modal-lobby-join"
-      >
-        <ModalJoinLobby handleClose={handleCloseLobbyJoin} />
-      </Modal>
-      <div className="flex h-full min-h-screen w-full flex-col items-center justify-center gap-2 sm:gap-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-12">
-          <PrimaryButton buttonText="Créer un lobby" onClick={createLobby} />
-          <SecondaryButton
-            buttonText="Rejoindre un lobby"
-            onClick={handleOpenLobbyJoin}
+    <>
+      <HeadDescription />
+      <LoadingAuth>
+        <Navbar />
+        <LobbyReconnectToast />
+        <ToastContainer transition={Slide} />
+        <Modal
+          open={openLobbyJoin}
+          onClose={handleCloseLobbyJoin}
+          aria-labelledby="modal-lobby-join"
+          aria-describedby="modal-lobby-join"
+        >
+          <ModalJoinLobby handleClose={handleCloseLobbyJoin} />
+        </Modal>
+        <div className="flex h-full min-h-screen w-full flex-col items-center justify-center gap-2 sm:gap-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-12">
+            <PrimaryButton buttonText="Créer un lobby" onClick={createLobby} />
+            <SecondaryButton
+              buttonText="Rejoindre un lobby"
+              onClick={handleOpenLobbyJoin}
+            />
+          </div>
+          <LinkButton
+            buttonText={'Retour'}
+            linkTo={'/'}
+            typeButton={TypeLinkButton.tertiary}
           />
+          {!isLogged && (
+            <p className="text-amber-400">
+              Vous devez être connecté pour jouer !
+            </p>
+          )}
+          <Footer />
         </div>
-        <LinkButton
-          buttonText={'Retour'}
-          linkTo={'/'}
-          typeButton={TypeLinkButton.tertiary}
-        />
-        {!isLogged && (
-          <p className="text-amber-400">
-            Vous devez être connecté pour jouer !
-          </p>
-        )}
-        <Footer />
-      </div>
-    </LoadingAuth>
+      </LoadingAuth>
+    </>
   );
 }

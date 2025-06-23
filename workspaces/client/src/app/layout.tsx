@@ -4,8 +4,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Last Hope',
-  description: 'Last Hope - online game',
+  title: 'Last Hope by Nqbral Games',
+  description: 'Jeu de stratégie en ligne avec zombies et trahison',
 };
 
 export default function RootLayout({
