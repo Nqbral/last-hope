@@ -165,9 +165,9 @@ export default function Game({ lobbyState, gameState }: Props) {
       <ToastContainer transition={Slide} />
 
       {/* GAME */}
-      <div className="flex h-screen min-h-screen w-full flex-row pt-20">
+      <div className="flex h-screen min-h-screen w-full flex-row pt-18 md:pt-20">
         <button
-          className="absolute top-20 left-4 z-50 lg:hidden"
+          className="absolute top-18 left-4 z-50 md:top-20 lg:hidden"
           onClick={() => setSidebarOpen(true)}
         >
           <Menu size={28} />
