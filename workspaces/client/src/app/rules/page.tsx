@@ -48,7 +48,6 @@ export default function RulesPage() {
 
             <div className="flex flex-col items-center gap-6">
               <h2 className="text-xl underline underline-offset-4">Rôles</h2>
-              <p>Les cartes de jeu représentent les différentes</p>
               <div className="flex flex-col items-center gap-2 rounded-md border-1 border-neutral-700 p-4 md:flex-row">
                 <Image src={DoctorImg} alt="doctor" className="w-32" />
                 <p className="md:w-xl">
