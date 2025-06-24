@@ -1,4 +1,5 @@
 import LinkButton, { TypeLinkButton } from '@components/buttons/LinkButton';
+import ErrorMessage from '@components/error_message/ErrorMessage';
 import Footer from '@components/footer/Footer';
 import Navbar from '@components/navbar/Navbar';
 import LobbyReconnectToast from '@components/toast/LobbyReconnectToast';
@@ -30,6 +31,7 @@ export default function Home() {
             typeButton={TypeLinkButton.secondary}
           />
         </div>
+        <ErrorMessage />
       </div>
       <Footer />
     </LoadingAuth>
