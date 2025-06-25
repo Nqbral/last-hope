@@ -12,6 +12,47 @@ import UserMinImg from '@public/user_min.png';
 import LoadingAuth from 'app/layout/LoadingAuth';
 import Image from 'next/image';
 
+export const metadata = {
+  title: 'Règles du jeu – Last Hope',
+  description:
+    "Consultez les règles officielles de Last Hope, le jeu de société en ligne. Découvrez comment jouer, les rôles, les cartes et les conditions de victoire dans un univers post-apocalyptique où Docteurs et Infectés s'affrontent.",
+  robots: 'index, follow',
+  openGraph: {
+    title: 'Règles du jeu – Last Hope',
+    description:
+      "Apprenez à jouer à Last Hope, jeu de bluff et de stratégie multijoueur. Retrouvez toutes les règles, objectifs et mécaniques pour sauver l'humanité ou faire exploser le laboratoire.",
+    url: 'https://last-hope.nqbral-games.fr/rules',
+    type: 'article',
+    images: [
+      {
+        url: 'https://last-hope.nqbral-games.fr/last-hope-logo.png',
+        width: 847,
+        height: 745,
+        alt: 'Logo Last Hope',
+      },
+    ],
+  },
+  keywords: [
+    'last hope',
+    'règles',
+    'jeu de société',
+    'jeu post-apocalyptique',
+    'time bomb',
+    'docteurs',
+    'infectés',
+    'virus',
+    'bluff',
+    'stratégie',
+    'multijoueur',
+    'jeu en ligne',
+    'règles du jeu',
+    'zombies',
+    'explosion',
+    'remède',
+    'laboratoire',
+  ],
+};
+
 export default function RulesPage() {
   return (
     <>

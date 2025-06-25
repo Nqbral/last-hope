@@ -1,8 +1,14 @@
 import LinkButton, { TypeLinkButton } from '@components/buttons/LinkButton';
 import Footer from '@components/footer/Footer';
 import Navbar from '@components/navbar/Navbar';
+import { Metadata } from 'next';
 
 import LoadingAuth from './layout/LoadingAuth';
+
+export const metadata: Metadata = {
+  title: 'Page incorrecte - Last Hope',
+  robots: 'noindex, nofollow',
+};
 
 export default function NotFound() {
   return (
