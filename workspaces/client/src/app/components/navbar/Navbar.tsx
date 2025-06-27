@@ -34,7 +34,7 @@ export default function Navbar() {
           <Image
             src={LastHopeLogo}
             className="w-24 sm:w-28 md:w-32"
-            alt="nqbral-games-logo"
+            alt="nqbral-games-logo-navbar"
           />
         </div>
       </Link>
