@@ -45,6 +45,13 @@ export const metadata: Metadata = {
     siteName: 'Last Hope',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Last Hope – Jeu de société post-apocalyptique en ligne',
+    description:
+      'Jouez à Last Hope, le jeu de bluff et de stratégie, dans un univers post-apocalyptique. Incarnez un Docteur ou un Infecté, trouvez les remèdes ou faites exploser le laboratoire. Gratuit, multijoueur et sans installation sur Nqbral Games.',
+    images: ['https://last-hope.nqbral-games.fr/last-hope-logo.png'],
+  },
   alternates: {
     canonical: 'https://last-hope.nqbral-games.fr/',
     languages: {
