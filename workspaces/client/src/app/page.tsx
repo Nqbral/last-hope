@@ -64,7 +64,6 @@ export default function Home() {
       <Script
         id="json-ld"
         type="application/ld+json"
-        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
