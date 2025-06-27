@@ -7,7 +7,7 @@ type AuthContextType = {
   accessToken: string | null;
   userName: string | null;
   isLoading: boolean;
-  isLogged: boolean;
+  isLogged: boolean | null;
   logout: () => Promise<void>;
 };
 
@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLogged, setIsLogged] = useState(false);
+  const [isLogged, setIsLogged] = useState<boolean | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {

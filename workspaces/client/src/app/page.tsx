@@ -7,8 +7,6 @@ import LastHopeLogo from '@public/last-hope-logo.png';
 import { Metadata } from 'next';
 import Image from 'next/image';
 
-import LoadingAuth from './layout/LoadingAuth';
-
 export const metadata: Metadata = {
   title: 'Last Hope – Jeu de société post-apocalyptique en ligne',
   description:
@@ -60,7 +58,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <LoadingAuth>
+    <>
       <Navbar />
       <LobbyReconnectToast />
       <div className="flex h-full min-h-screen w-full flex-col items-center justify-center gap-6">
@@ -69,6 +67,10 @@ export default function Home() {
           alt="last-hope-logo"
           className="w-32 sm:w-48 md:w-64"
         />
+        <h1 className="px-4 text-center text-sm sm:text-lg md:text-xl">
+          Last Hope - Jeu de bluff à rôles cachés dans un univers
+          post-apocalyptique
+        </h1>
         <div className="flex flex-col gap-1 md:flex-row md:gap-12">
           <LinkButton
             buttonText={'Jouer'}
@@ -84,6 +86,6 @@ export default function Home() {
         <ErrorMessage />
       </div>
       <Footer />
-    </LoadingAuth>
+    </>
   );
 }
