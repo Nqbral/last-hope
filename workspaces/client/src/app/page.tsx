@@ -6,12 +6,13 @@ import LobbyReconnectToast from '@components/toast/LobbyReconnectToast';
 import LastHopeLogo from '@public/last-hope-logo.png';
 import { Metadata } from 'next';
 import Image from 'next/image';
+import Script from 'next/script';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Last Hope – Jeu de société post-apocalyptique en ligne',
   description:
-    'Jouez à Last Hope, le jeu de bluff et de stratégie, dans un univers post-apocalyptique. Incarnez un Docteur ou un Infecté, trouvez les remèdes ou faites exploser le laboratoire. Gratuit, multijoueur et sans installation sur Nqbral Games.',
+    'Découvrez Last Hope, jeu de bluff et de stratégie multijoueur. Sauvez l’humanité ou faites exploser le laboratoire dans ce jeu de bluff à rôles cachés.',
   keywords: [
     'Last Hope',
     'jeu de société',
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Last Hope – Jeu de société post-apocalyptique en ligne',
     description:
-      'Découvrez Last Hope, jeu de bluff et de stratégie multijoueur. Sauvez l’humanité ou faites exploser le laboratoire dans ce jeu de bluff à rôles cachés. Rejoignez la partie sur Nqbral Games !',
+      'Jouez à Last Hope, le jeu de bluff et de stratégie, dans un univers post-apocalyptique. Incarnez un Docteur ou un Infecté, trouvez les remèdes ou faites exploser le laboratoire. Gratuit, multijoueur et sans installation sur Nqbral Games.',
     url: 'https://last-hope.nqbral-games.fr/',
     images: [
       {
@@ -60,6 +61,25 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
+      <Script
+        id="json-ld"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'Last Hope',
+            url: 'https://last-hope.nqbral-games.fr/',
+            alternateName: 'Nqbral Games',
+            inLanguage: 'fr',
+            sameAs: [
+              'https://nqbral-games.fr/',
+              'https://shadow-network.nqbral-games.fr/',
+            ],
+          }),
+        }}
+      />
       <Suspense>
         <Navbar />
       </Suspense>
