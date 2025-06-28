@@ -6,7 +6,6 @@ import LobbyReconnectToast from '@components/toast/LobbyReconnectToast';
 import LastHopeLogo from '@public/last-hope-logo.png';
 import { Metadata } from 'next';
 import Image from 'next/image';
-import Script from 'next/script';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
@@ -61,24 +60,6 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      <Script
-        id="json-ld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'WebSite',
-            name: 'Last Hope',
-            url: 'https://last-hope.nqbral-games.fr/',
-            alternateName: 'Nqbral Games',
-            inLanguage: 'fr',
-            sameAs: [
-              'https://nqbral-games.fr/',
-              'https://shadow-network.nqbral-games.fr/',
-            ],
-          }),
-        }}
-      />
       <Suspense>
         <Navbar />
       </Suspense>
