@@ -1,6 +1,7 @@
 'use client';
 
 import axios from '@lib/axiosInstance';
+import plainAxios from '@lib/plainAxios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type AuthContextType = {
@@ -77,7 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const authenticate = async () => {
       try {
-        await axios
+        await plainAxios
           .post(process.env.NEXT_PUBLIC_WS_API_AUTH_URL + '/auth/refresh', {
             withCredentials: true,
           })
