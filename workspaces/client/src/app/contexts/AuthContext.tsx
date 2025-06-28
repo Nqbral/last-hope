@@ -89,10 +89,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               return;
             }
 
+            setIsLoading(false);
+            setIsLogged(false);
             setAccessToken(null);
           });
       } catch (error) {
         console.error('Erreur lors du refresh token', error);
+        setIsLoading(false);
+        setIsLogged(false);
         setAccessToken(null);
       }
 
