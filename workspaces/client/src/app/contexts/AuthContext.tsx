@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log(error);
         console.log('tentative refresh');
         try {
-          await axios
+          await plainAxios
             .post(process.env.NEXT_PUBLIC_WS_API_AUTH_URL + '/auth/refresh', {
               withCredentials: true,
             })
