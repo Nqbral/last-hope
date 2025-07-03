@@ -18,12 +18,21 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
-      
+
       - name: Cleanup Docker on VPS
         run: |
           ssh -i ~/.ssh/id_ed25519 root@${{ secrets.VPS_HOST }} << 'EOF'
-            echo "Cleanup Docker unused resources..."
-            docker system prune -af --volumes
+          echo "Cleanup Docker unused resources..."
+          echo "Stop containers"
+          docker stop $(docker ps --filter "name=^last-hope" -q)
+          echo "Remove containers"
+          docker rm $(docker ps -a --filter "name=^last-hope" -q)
+          echo "Remove images"
+          docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}" | grep "^last-hope")
+          echo "Remove volumes"
+          docker volume rm $(docker volume ls --format "{{.Name}}" | grep "^last-hope")
+          echo "Remove networks"
+          docker network rm $(docker network ls --format "{{.Name}}" | grep "^last-hope")
           EOF
 
       - name: Deploy via SSH
